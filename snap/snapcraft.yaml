@@ -119,51 +119,6 @@ parts:
     prime:
       - -*
 
-  runtime-patching:
-    source: snap/local/runtime-patching
-    plugin: nil
-    build-packages:
-      - gcc
-    stage-packages:
-      - binutils
-    override-build: |
-      install \
-        --directory \
-        --verbose \
-        "${SNAPCRAFT_PART_INSTALL}/runtime-patching/"
-      gcc \
-        -shared \
-        -fPIC \
-        fopen_wrapper.c \
-        -o "${SNAPCRAFT_PART_INSTALL}/runtime-patching/fopen_wrapper.so" \
-        -ldl
-      strip \
-        "${SNAPCRAFT_PART_INSTALL}/runtime-patching/fopen_wrapper.so"
-      gcc \
-        -shared \
-        -fPIC \
-        stat_wrapper.c \
-        -o "${SNAPCRAFT_PART_INSTALL}/runtime-patching/stat_wrapper.so" \
-        -ldl
-      strip \
-        "${SNAPCRAFT_PART_INSTALL}/runtime-patching/stat_wrapper.so"
-      gcc \
-        -shared \
-        -fPIC \
-        __xstat_wrapper.c \
-        -o "${SNAPCRAFT_PART_INSTALL}/runtime-patching/__xstat_wrapper.so" \
-        -ldl
-      strip \
-        "${SNAPCRAFT_PART_INSTALL}/runtime-patching/__xstat_wrapper.so"
-
-  # Replacing hard coded paths in ELF binaries - tape software
-  # https://tapesoftware.net/replace-symbol/
-  patchelf:
-    source: https://git.sr.ht/~raphi/patchelf
-    source-branch: replace-symbol
-    source-type: git
-    plugin: autotools
-
   # Launcher programs to fix problems at runtime
   launchers:
     source: snap/local/launchers
