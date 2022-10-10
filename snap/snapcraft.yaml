@@ -324,13 +324,6 @@ parts:
         iscan.desktop \
         "${SNAPCRAFT_PART_INSTALL}/usr/local/share/applications/"
 
-      # Run-time data dir, for plugins' functionality
-      install \
-        --directory \
-        --mode 0755 \
-        --verbose \
-        "${SNAPCRAFT_PART_INSTALL}/usr/local/var/lib/iscan"
-
     override-prime: |
       set \
         -o nounset
