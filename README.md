@@ -96,22 +96,23 @@ the following materials:
 The esmod library, although shipped with a copy of the EPSON END USER
 SOFTWARE LICENSE(/non-free/COPYING.EPSON.en.txt) claiming:
 
-<!-- markdownlint-disable-next-line ol-prefix list-marker-space -->
-> 3. \ \ \ \ Other Rights and Limitations.  You agree not to modify, adapt or
-> translate the Software and further agree not to attempt to reverse
-> engineer, decompile, disassemble or otherwise attempt to discover the
-> source code of the Software.  **You may not rent, lease, distribute,
-> lend the Software to third parties or incorporate the Software into a
-> revenue generating product or service.**  You may, however, transfer
-> all of your rights to use the Software to another person or legal
-> entity, provided that the recipient also agrees to the terms of this
-> Agreement and you transfer the Software, including all copies, updates
-> and prior versions, and the Epson Hardware, to such person or entity.
-> The Software is licensed as a single unit, and its component programs
-> may not be separated for some other use.  Further, you agree not to
-> place the Software onto or into a shared environment accessible via a
-> public network such as the Internet or otherwise accessible by others
-> outside the single location referred to in Section 1 above.
+```plaintext
+3.     Other Rights and Limitations.  You agree not to modify, adapt or
+translate the Software and further agree not to attempt to reverse
+engineer, decompile, disassemble or otherwise attempt to discover the
+source code of the Software.  **You may not rent, lease, distribute,
+lend the Software to third parties or incorporate the Software into a
+revenue generating product or service.**  You may, however, transfer
+all of your rights to use the Software to another person or legal
+entity, provided that the recipient also agrees to the terms of this
+Agreement and you transfer the Software, including all copies, updates
+and prior versions, and the Epson Hardware, to such person or entity.
+The Software is licensed as a single unit, and its component programs
+may not be separated for some other use.  Further, you agree not to
+place the Software onto or into a shared environment accessible via a
+public network such as the Internet or otherwise accessible by others
+outside the single location referred to in Section 1 above.
+```
 
 The frontend wrapper code from the same source archive
 (/frontend/esmod-wrapper.hh) have another passage that specifically
@@ -119,15 +120,17 @@ gives permission to distribute the library, as long as it is a linked
 combination including the two(Image Scan! for Linux V2 and the esmod
 library):
 
-> //  This file is part of the 'iscan' program.
->
-> ...stripped...
->
-> //  **As a special exception, the copyright holders give permission
-> //  to link the code of this program with the esmod library and
-> //  distribute linked combinations including the two.**  You must obey
-> //  the GNU General Public License in all respects for all of the
-> //  code used other then esmod.
+```c
+//  This file is part of the 'iscan' program.
+
+...stripped...
+
+//  **As a special exception, the copyright holders give permission
+//  to link the code of this program with the esmod library and
+//  distribute linked combinations including the two.**  You must obey
+//  the GNU General Public License in all respects for all of the
+//  code used other then esmod.
+```
 
 As for the device support non-free plugins and other resources, this
 snap incorporated efforts to allow the user to obtain and use them

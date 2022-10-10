@@ -48,3 +48,5 @@ MD041:
 
 # Empty links are for the template consumer to fill in
 MD042: false
+
+code-block-style: False
