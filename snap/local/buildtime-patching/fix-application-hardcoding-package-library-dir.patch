@@ -1,0 +1,37 @@
+This patch changes the PKGLIBDIR directory to SNAP_USER_COMMON to allow
+installing non-free plugins.
+
+Copyright 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+SPDX-License-Identifier: MIT
+
+diff -ur iscan-2.30.4/backend/epkowa_ip.c iscan-2.30.4.patched/backend/epkowa_ip.c
+--- iscan-2.30.4/backend/epkowa_ip.c	2017-03-13 17:16:26.000000000 +0800
++++ iscan-2.30.4.patched/backend/epkowa_ip.c	2022-10-09 17:11:17.432292374 +0800
+@@ -56,6 +56,7 @@
+ #include <signal.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <stdlib.h>
+
+ #include "epkowa_ip.h"
+ #include "cfg-obj.h"
+@@ -441,9 +442,17 @@
+      path's directories.  */
+   {
+     const char *path = lt_dlgetsearchpath ();
+-    if (!(path && strstr (path, PKGLIBDIR)))
++
++    char *snap_user_common_dir = getenv("SNAP_USER_COMMON");
++    int snap_user_common_dir_length = strlen(snap_user_common_dir);
++
++    char const *user_plugins_dir_path = "/plugins";
++    char *user_plugins_dir = (char*) malloc(snap_user_common_dir_length + strlen(user_plugins_dir_path) + 1);
++    strcpy(user_plugins_dir, snap_user_common_dir);
++    strcat(user_plugins_dir, user_plugins_dir_path);
++    if (!(path && strstr (path, user_plugins_dir)))
+     {
+-      lt_dladdsearchdir (PKGLIBDIR);
++      lt_dladdsearchdir (user_plugins_dir);
+     }
+     handle = lt_dlopenext (name);
+   }

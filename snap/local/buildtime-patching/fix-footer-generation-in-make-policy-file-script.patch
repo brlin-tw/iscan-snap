@@ -1,0 +1,17 @@
+This patch fixes the make-policy-file script to be compatible with
+udev rules shipped in newer Linux systems(e.g. Ubuntu 22.04)
+
+Copyright 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+SPDX-License-Identifier: MIT
+
+--- policy/make-policy-file.in	2022-10-09 06:32:11.474304649 +0800
++++ policy/make-policy-file.in	2022-10-09 06:52:01.872538620 +0800
+@@ -372,7 +372,7 @@
+     case "$MODE" in
+ 	udev)
+ 	    line_count=`cat $1 | wc -l`
+-	    last=`sed -n '/{idProduct}/ =' $1 | tail -n 1`
++	    last=`sed -n -E '/(\{idProduct\}|\{type\})/ =' $1 | tail -n 1`
+ 	    num_lines=`expr $line_count \- $last`
+ 	    tail -n $num_lines $1
+ 	    ;;

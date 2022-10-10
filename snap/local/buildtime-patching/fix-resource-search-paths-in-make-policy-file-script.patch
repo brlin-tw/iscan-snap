@@ -1,0 +1,32 @@
+This patch adds snap-specific directories to the policy generation
+program in order to locate the resources.
+
+Copyright 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+SPDX-License-Identifier: MIT
+
+--- policy/make-policy-file.in	2022-10-09 06:32:11.474304649 +0800
++++ policy/make-policy-file.in	2022-10-09 06:35:25.061626479 +0800
+@@ -118,6 +118,7 @@
+   fi
+   for dir in \
+       $test_dirs \
++      "${SNAP}/share/iscan-data" \
+       /usr/share/local/iscan-data \
+       /opt/share/iscan-data \
+       /usr/share/iscan-data \
+@@ -253,6 +254,7 @@
+ 		    "*scanner.fdi" \
+ 		    ; do
+ 		    for dir in \
++		    "${SNAP}/usr/share/hal" \
+ 			/usr/share/hal \
+ 			/etc/hal \
+ 			/usr/local/share/hal \
+@@ -272,6 +274,7 @@
+ 		    "*usbscanner.rules" \
+ 		    ; do
+ 		    for dir in \
++		    ${SNAP}/lib/udev/rules.d \
+ 			/lib/udev/rules.d \
+ 			/etc/udev/rules.d \
+ 			/dev/.udev/rules.d \

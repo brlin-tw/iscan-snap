@@ -1,0 +1,50 @@
+This patch changes the local state directory to SNAP_USER_COMMON to
+allow registering non-free plugins.
+
+Copyright 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+SPDX-License-Identifier: MIT
+
+--- backend/cfg-obj.c	2022-10-09 10:24:07.937290898 +0800
++++ backend/cfg-obj.c	2022-10-09 10:22:44.663787850 +0800
+@@ -335,7 +335,16 @@
+        * so we don't have to track them anymore.
+        */
+       id = CFG_KEY_INTERPRETER;
+-      fp = _cfg_fopen_data (PKGLOCALSTATEDIR, _cfg_key[id]);
++
++      /* WORKAROUND: Use SNAP_USER_COMMON directory for local
++       * state to allow user registering non-free plugins */
++      char* snap_user_common_dir = getenv("SNAP_USER_COMMON");
++      int snap_user_common_dir_length = strlen(snap_user_common_dir);
++      char* user_local_state_dir = (char*) malloc(snap_user_common_dir_length + strlen("/state") + 1);
++      strcpy(user_local_state_dir, snap_user_common_dir);
++      strcat(user_local_state_dir, "/state");
++
++      fp = _cfg_fopen_data (user_local_state_dir, _cfg_key[id]);
+       if (fp)
+         {
+           size_t size = 0;
+@@ -354,10 +362,11 @@
+           if (fclose (fp))
+             {
+               err_minor ("%s%s%s: %s",
+-                         PKGLOCALSTATEDIR, FILE_SEP_STR, _cfg_key[id],
++                         user_local_state_dir, FILE_SEP_STR, _cfg_key[id],
+                          strerror (errno));
+             }
+         }
++      free(user_local_state_dir);
+     }
+
+   fp = _cfg_fopen_conf (cfg_file_name);
+
+--- utils/iscan-registry.in	2017-03-13 17:16:26.000000000 +0800
++++ utils/iscan-registry.in	2022-10-09 10:33:22.009024933 +0800
+@@ -20,7 +20,7 @@
+ #  along with this package.  If not, see <http://www.gnu.org/licenses/>.
+
+
+-STATEDIR=@PKGLOCALSTATEDIR@
++STATEDIR="${SNAP_USER_COMMON}/state"
+
+ #  Output a version blurb.

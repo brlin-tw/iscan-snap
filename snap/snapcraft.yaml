@@ -1,6 +1,6 @@
 %YAML 1.1
 ---
-# Snapcraft Recipe for [Project]
+# Snapcraft Recipe for Image Scan! for Linux (V2, UNOFFICIAL)
 # ------------------------------
 # This file is in the YAML data serialization format:
 # http://yaml.org
@@ -13,34 +13,56 @@
 #   https://forum.snapcraft.io/c/doc
 # For support refer to the snapcraft section in the Snapcraft Forum:
 # https://forum.snapcraft.io/c/snapcraft
+#
+# Copyright 2018-2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+# SPDX-License-Identifier: MIT
 
 # All following comments, including this one, are designed to be stripped
 # before contributing the recipe to the upstream
 
-# [Project], my-awesome-app, my-awesome-app-launch
-# are placeholders text meant to be replaced by appropriate content
-name: my-awesome-app
-title: My Awesome App.
-summary: Single-line elevator pitch for your amazing snap under 79 chars.
+name: iscan
+title: Image Scan! for Linux (V2, UNOFFICIAL)
+summary: Graphical scanner utility for Epson scanners
 description: |
-  This is my-awesome-app's description. You have a paragraph or two to tell
-  the most important story about your snap. Keep it under 100 words though,
-  we live in tweetspace and your description wants to look good in the snap
-  store.
+    Image Scan! is a graphical scanner utility for people that do not
+    need all the bells and whistles provided by several of the other
+    utilities out there (xsane, QuiteInsane, Kooka).
 
-  This is the demonstration app of the Snapcrafters Template Plus:
-  https://github.com/Lin-Buo-Ren/snapcrafters-template-plus
+    At the moment it only supports SEIKO EPSON devices.  However, the
+    device driver it provides can be used by any other SANE standard
+    compliant scanner utility.
+
+    Note that several scanners require a non-free plugin before they
+    can be used with this software.  Using a scanner directly through
+    a network interface also requires a non-free plugin.
+
+    ## Packager's note
+
+    This is the old, obsoleted version of the Image Scan! for Linux,
+    which is in turn superseded by the following products:
+
+    * Image Scan v3 (codename: Utsushi)
+    * Epson Scan 2
+
+    The motivation of building this is that the packager felt this
+    version to be more polished and less bugs while using.
+
+    This is NOT an official distribution of Image Scan! for Linux,
+    refer to the project's own issue tracker for support:
+
+    Issues · brlin-tw/iscan-snap
+    https://github.com/brlin-tw/iscan-snap/issues
 
 # The path of icon to represent the snap, relative to the source tree directory
 # Only PNG or SVG image is supported, dimension must be greater than 256x256px
-icon: snap/gui/my-awesome-app.png
+#icon: snap/gui/iscan.png
 
 # The license of this application, in SPDX format
 # NOTE: Currently only supports SPDX 2.1 license expressions, as described in Appendix IV of
 # https://spdx.org/spdx-specification-21-web-version
 # Supported expressions:
 # https://github.com/snapcore/snapd/blob/HEAD/spdx/licenses.go
-#license:
+license: GPL-2.0-only
 
 # Version string just for humans, typically '1.2+git' or '1.3.2'
 # The wrapping single quotes are often required to avoid the version string
@@ -48,7 +70,7 @@ icon: snap/gui/my-awesome-app.png
 # http://yaml.org/type
 # https://arp242.net/weblog/yaml_probably_not_so_great_after_all.html#surprising-behaviour
 # NOTE: This key is mutual exclusive with the `adopt-info` key
-#version: Derived from the part specified by the `adopt-info` property
+#version: 2.30.4-2+data1.39.2-1
 
 # Extract metadata from the main snap part
 # https://forum.snapcraft.io/t/extracting-information-from-sources-in-snapcraft-parts/4642
@@ -62,7 +84,7 @@ assumes:
 # Base runtime
 # The common runtime for the snap to run on, or `bare` for static linked applications
 # https://docs.snapcraft.io/snapcraft-top-level-metadata/8334#heading--base
-base: core18
+base: core20
 
 # Security confinement
 # Use `devmode` to getting started
@@ -76,20 +98,71 @@ confinement: strict
 # snaps can be promoted to `candidate` and `stable` channels
 grade: stable
 
+# Currently only supports i386/amd64
+architectures:
+  - build-on: amd64
+    run-on: amd64
+  - build-on: i386
+    run-on: i386
+
 # Run `snapcraft help sources` for supported keywords on pulling a part's source ingredients
 # Run `snapcraft plugins` for supported build helper plugins
 # Run `snapcraft help plugins` for supported keywords on building a part
 # For `override-*` scriptlets used to modify behavior of certain part's lifecycle phase, check out:
 # https://docs.snapcraft.io/scriptlets/4892
 parts:
-  # Files to patch the files in the snap
-  patching:
-    source: snap/local/patching
+  buildtime-patching:
+    source: snap/local/buildtime-patching
     plugin: dump
     organize:
-      '*': patching/
+      '*': buildtime-patching/
     prime:
       - -*
+
+  runtime-patching:
+    source: snap/local/runtime-patching
+    plugin: nil
+    build-packages:
+      - gcc
+    stage-packages:
+      - binutils
+    override-build: |
+      install \
+        --directory \
+        --verbose \
+        "${SNAPCRAFT_PART_INSTALL}/runtime-patching/"
+      gcc \
+        -shared \
+        -fPIC \
+        fopen_wrapper.c \
+        -o "${SNAPCRAFT_PART_INSTALL}/runtime-patching/fopen_wrapper.so" \
+        -ldl
+      strip \
+        "${SNAPCRAFT_PART_INSTALL}/runtime-patching/fopen_wrapper.so"
+      gcc \
+        -shared \
+        -fPIC \
+        stat_wrapper.c \
+        -o "${SNAPCRAFT_PART_INSTALL}/runtime-patching/stat_wrapper.so" \
+        -ldl
+      strip \
+        "${SNAPCRAFT_PART_INSTALL}/runtime-patching/stat_wrapper.so"
+      gcc \
+        -shared \
+        -fPIC \
+        __xstat_wrapper.c \
+        -o "${SNAPCRAFT_PART_INSTALL}/runtime-patching/__xstat_wrapper.so" \
+        -ldl
+      strip \
+        "${SNAPCRAFT_PART_INSTALL}/runtime-patching/__xstat_wrapper.so"
+
+  # Replacing hard coded paths in ELF binaries - tape software
+  # https://tapesoftware.net/replace-symbol/
+  patchelf:
+    source: https://git.sr.ht/~raphi/patchelf
+    source-branch: replace-symbol
+    source-type: git
+    plugin: autotools
 
   # Launcher programs to fix problems at runtime
   launchers:
@@ -109,36 +182,41 @@ parts:
     prime:
       - -*
 
-  # Stage snap for fixing the Glibc locales
-  # https://forum.snapcraft.io/t/the-locales-launch-stage-snap/10296
-  locales-launch:
-    source: https://github.com/Lin-Buo-Ren/locales-launch.git
-    source-tag: v1.0.0
-    plugin: dump
-    stage-packages:
-      - libc-bin
-      - locales
-    stage:
-      - bin/locales-launch
-      - etc/locale.alias
-      - usr/bin/localedef
-      - usr/share/doc/locales
-      - usr/share/i18n
-      - usr/share/locale
-
-  # Remote part for support of various desktop technologies
-  # Refer: https://github.com/ubuntu/snapcraft-desktop-helpers/blob/master/snapcraft.yaml
-  desktop-gnome-platform:
+  # This part installs the `desktop-launch` script which initialises desktop
+  # features such as fonts, themes and the XDG environment. It also installs
+  # the GTK2 runtime libraries.
+  #
+  # It is copied straight from the snapcraft desktop helpers project. Please
+  # periodically check the source for updates and copy the changes.
+  #    https://github.com/ubuntu/snapcraft-desktop-helpers/blob/master/snapcraft.yaml
+  #
+  desktop-gtk2:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-depth: 1
     source-subdir: gtk
-
     plugin: make
+    make-parameters:
+      - FLAVOR=gtk2
     build-packages:
-      - gcc
-    override-build: |
-      snapcraftctl build
-      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
+      - libgtk2.0-dev
+    stage-packages:
+      - adwaita-icon-theme
+      - dmz-cursor-theme
+      - fcitx5-frontend-gtk2
+      - fcitx-frontend-gtk2
+      - gnome-themes-standard
+      - ibus-gtk
+      - libappindicator1
+      - libgdk-pixbuf2.0-0
+      - libglib2.0-bin
+      - libgtk2.0-0
+      - libgtk2.0-bin
+      - libibus-1.0-5
+      - libxkbcommon0  # XKB_CONFIG_ROOT
+      - light-themes
+      - locales-all
+      - shared-mime-info
+      - ttf-ubuntu-font-family
+      - unity-gtk2-module
 
   # Integrate custom dialogs in your snap - doc - snapcraft.io
   # https://forum.snapcraft.io/t/integrate-custom-dialogs-in-your-snap/10825
@@ -147,31 +225,156 @@ parts:
     stage-snaps:
       - zenity-integration
 
+  # ltrace for runtime-patching debugging
+  # NOTE: For some reason it only be usable when the snap is install with --dev-mode
+  ltrace:
+    plugin: nil
+    stage-packages:
+      - ltrace
+
+  # iscan-data
+  data:
+    after:
+      - buildtime-patching
+    source: http://support.epson.net/linux/src/scanner/iscan/iscan-data_1.39.2-1.tar.gz
+    plugin: autotools
+    build-packages:
+      - xsltproc
+    stage-packages:
+      - xsltproc
+    #autotools-configure-parameters:
+      #- --prefix=
+    override-build: |
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-resource-search-paths-in-make-policy-file-script.patch"
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-header-generation-in-make-policy-file-script.patch"
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-footer-generation-in-make-policy-file-script.patch"
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-stanza-generation-in-make-policy-file-script.patch"
+
+      snapcraftctl build
+
   main:
     after:
-      # for patch-desktop-entries.*
-      - patching
-
-      # for override-pull script
+      - buildtime-patching
       - scriptlets
 
-    source: .
-    #source-type:
-    #source-branch:
-    #source-tag:
-    #source-depth:
+    source: http://support.epson.net/linux/src/scanner/iscan/iscan_2.30.4-2.tar.gz
     override-pull: |
       set -o nounset
 
       snapcraftctl pull
 
-      "${SNAPCRAFT_STAGE}"/scriptlets/main-adopt-info
+      bash -x "${SNAPCRAFT_STAGE}"/scriptlets/main-adopt-info
 
-    plugin: dump
-    organize:
-      my-awesome-app: bin/
-    stage:
-      - bin/*
+    plugin: autotools
+    autotools-configure-parameters:
+      - --enable-dependency-reduction
+      - --enable-frontend
+      - --enable-jpeg
+      - --enable-png
+      - --enable-tiff
+      - LDFLAGS=-lpng
+    build-packages:
+      - libgimp2.0-dev
+      - libgtk2.0-dev
+      - libjpeg-dev
+      - libltdl-dev
+      - libpng-dev
+      - libsane-dev
+      - libtiff-dev
+      - libusb-1.0-0-dev
+      - libxml2-dev
+      - pkg-config
+    stage-packages:
+      - libatk1.0-0
+      - libcairo2
+      - libdatrie1
+      - libfribidi0
+      - libgdk-pixbuf2.0-0
+      - libgraphite2-3
+      - libgtk2.0-0
+      - libharfbuzz0b
+      - libjpeg8
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpng16-16
+      - libsane
+      - libthai0
+      - libtiff5
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcomposite1
+      - libxcursor1
+      - libxdamage1
+      - libxext6
+      - libxfixes3
+      - libxi6
+      - libxinerama1
+      - libxrandr2
+      - libxrender1
+
+    override-build: |
+      set -o nounset
+
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/libpng15.patch"
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/jpegstream.cc.patch"
+      #patch \
+        #--strip=0 \
+        #<"${SNAPCRAFT_STAGE}/buildtime-patching/hain01commits2dip-obj.patch"
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/iscan-2.30.4.2-c99.patch"
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/iscan-2.30.3_fix-sscanf-modifier-in-cfg-obj.patch"
+      patch \
+        --strip=0 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-local-state-dir.patch"
+      patch \
+        --strip=1 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-package-library-dir.patch"
+
+      # add fix for CXX ABI different than 1002
+      ln -s libesmod-x86_64.c2.so non-free/libesmod-x86_64.so
+
+      snapcraftctl build
+      install \
+        --mode 0644 \
+        --verbose \
+        backend/epkowa.conf \
+        "${SNAPCRAFT_PART_INSTALL}/etc/sane.d/"
+      echo epkowa > "${SNAPCRAFT_PART_INSTALL}/etc/sane.d/dll.d/epkowa.conf"
+
+      install \
+        --directory \
+        --mode 0755 \
+        --verbose \
+        "${SNAPCRAFT_PART_INSTALL}/usr/local/share/applications/"
+      install \
+        --mode 0644 \
+        --verbose \
+        iscan.desktop \
+        "${SNAPCRAFT_PART_INSTALL}/usr/local/share/applications/"
+
+      # Run-time data dir, for plugins' functionality
+      install \
+        --directory \
+        --mode 0755 \
+        --verbose \
+        "${SNAPCRAFT_PART_INSTALL}/usr/local/var/lib/iscan"
 
     override-prime: |
       set \
@@ -179,30 +382,58 @@ parts:
 
       snapcraftctl prime
 
-      "${SNAPCRAFT_STAGE}"/patching/patch-desktop-entries.bash
+      # Drop unused sane daemon drop-in configuration files to cut down
+      # application launch time
+      for sane_daemon_dropin_config in "${SNAPCRAFT_PRIME}/etc/sane.d/"*.conf; do
+        config_filename="${sane_daemon_dropin_config##*/}"
+        config_name="${config_filename%.*}"
+        if test "${config_name}" == epkowa; then
+          continue
+        fi
+        rm \
+          --verbose \
+          "${sane_daemon_dropin_config}"
+      done
+
+      "${SNAPCRAFT_STAGE}/buildtime-patching/patch-desktop-entries.bash"
 
 # Apps that are exposed by the snap package
-# If the _app_name_ is identical with the _snap_name_ it can be directly run
-# with `_snap_name_` or `snap run _snap_name_` commands, otherwise it can only be run
-# via `_snap_name_._app_name_` or `snap run _snap_name_._app_name_`
+# If the _app_name_ is identical with the iscan it can be directly run
+# with `iscan` or `snap run iscan` commands, otherwise it can only be run
+# via `iscan._app_name_` or `snap run iscan._app_name_`
 apps:
-  my-awesome-app:
-    # The adapter to set up runtime environment at the launch of the snap
-    # NOTE: The `command-chain` property is only supported by the `full` adapter
-    adapter: full
-
+  iscan:
     # An *relative path* to an executable file root from the `prime` directory to be executed, and its command-line arguments
     # NOTE: The right angle bracket at the beginning of the value of the `command` keyword starts a YAML folded style block scalar, refer the following spec document for more info: http://yaml.org/spec/1.2/spec.html#id2796251
-    command: bin/my-awesome-app
+    command: usr/local/bin/iscan
 
     # The commands that are run, in order, before running the one specified by the `command` key
     command-chain:
       - bin/desktop-launch
-      - bin/my-awesome-app-launch
+      - bin/iscan-launch
 
     # If the providing part of the app. has a desktop entry, specify its path relative to the `prime` directory.
     # If the packaging target doesn't provide a desktop entry, ignore the `desktop` key and implement a desktop entry in `/snap/gui`
-    #desktop: share/applications/my-awesome-app.desktop
+    desktop: usr/local/share/applications/iscan.desktop
+
+    environment:
+      GTK_PATH: $SNAP/lib/gtk-2.0
+      GTK_DATA_PREFIX: $SNAP
+      XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
+
+      SANE_CONFIG_DIR: $SNAP/etc/sane.d
+      LD_LIBRARY_PATH: $SNAP/usr/local/lib/sane:$SNAP/usr/local/lib
+
+  make-policy-file:
+    command: usr/local/lib/iscan-data/make-policy-file
+
+  registry:
+    command: usr/local/sbin/iscan-registry
+
+# Filesystem workarounds for applications that hardcode their paths
+layout:
+  /usr/local/share/iscan-data:
+    symlink: $SNAP/usr/local/share/iscan-data
 
 # Refer the following documentation for asserting interface plugs and slots in a security confined snap:
 # Interface management - doc - snapcraft.io
@@ -218,32 +449,32 @@ plugs:
   unity7:
   wayland:
 
-  # GNOME and Gtk runtime via content sharing
-  # https://forum.snapcraft.io/t/desktop-app-support-gtk/6834
-  gnome-3-28-1804:
-    interface: content
-    target: $SNAP/gnome-platform
-    default-provider: gnome-3-28-1804
-
-  # Gtk Common Themes support
+  # Gtk2 Common Themes support
   # https://forum.snapcraft.io/t/how-to-use-the-system-gtk-theme-via-the-gtk-common-themes-snap/6235
-  gsettings:
-  gtk-3-themes:
+  gtk-2-engines:
     interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
+    target: $SNAP/lib/gtk-2.0
+    default-provider: gtk2-common-themes:gtk-2-engines
+  gtk-2-themes:
+    interface: content
+    target: $SNAP/share/themes
+    default-provider: gtk2-common-themes:gtk-2-themes
   icon-themes:
     interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
+    target: $SNAP/share/icons
+    default-provider: gtk-common-themes:icon-themes
+  gtk2-config:
+    interface: personal-files
+    read:
+      - $HOME/.gtkrc-2.0
+      - $HOME/.config/gtkrc-2.0
+
+  # Allow sysfs device traversal
+  hardware-observe:
 
   # Regular files access
-  #home:
-  #removable-media: # Non-A/C
+  home:
+  removable-media: # Non-A/C
 
   # Application-specific files access
   # The auto-connection requires store grant
@@ -252,13 +483,18 @@ plugs:
   #user-wide-configs:
     #interface: personal-files
     #read:
-      #- $HOME/.config/my-awesome-app
+      #- $HOME/.config/iscan
   #system-wide-configs:
     #interface: system-files
     #read:
-      #- /etc/my-awesome-app
+      #- /etc/iscan
 
   # Network access
   #network:
 
+  # Allow raw USB interface access
+  raw-usb:
+
+  # Allow ltrace for debugging
+  system-trace:
 #slots:

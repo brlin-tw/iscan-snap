@@ -1,0 +1,1 @@
+The content using this pseudo-license means that the content is provided in the AUR with no license specified.

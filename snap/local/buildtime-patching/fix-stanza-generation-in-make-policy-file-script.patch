@@ -1,0 +1,23 @@
+This patch fixes the stanza generation logic of the policy file
+generation script which seems to be unable to deal with udev rules
+shipped in newer systems(Ubuntu 22.04).
+
+It might not work for other Linux distros, though.
+
+Copyright 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+SPDX-License-Identifier: MIT
+
+--- policy/make-policy-file.in	2022-10-09 06:32:11.474304649 +0800
++++ policy/make-policy-file.in	2022-10-09 07:33:18.488368601 +0800
+@@ -386,9 +386,8 @@
+ get_stanza () {
+     case "$MODE" in
+ 	udev)
+-	    sed -n \
+-		-e '/[[:upper:]][[:upper:]]*{idVendor}=\{1,2\}"04[bB]8"/{ p; q }' \
+-		$1 | sed 's|\([[:upper:]][[:upper:]]*{idProduct}=\{1,2\}\)"[[:xdigit:]]\{4\}"|\1"####"|'
++		printf \
++			'ATTR{idVendor}=="04B8", ATTR{idProduct}=="####", ENV{libsane_matched}="yes"'
+ 	    ;;
+ 	*)
+ 	    mesg "internal error: inconsistent $MODE handling" >&2

@@ -12,6 +12,9 @@
 #       Expressions: selecting text
 #     * Back-references and Subexpressions - Regular Expressions:
 #       selecting text
+#
+# Copyright 2018, 2019 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+# SPDX-License-Identifier: MIT
 
 ## Append '(Snap)' to the application name to make it
 ## distinguishable with the other same application using different
@@ -25,4 +28,4 @@
 s/^\(Name\(\[.\+\]\)\?=.*\)$/\1 (Snap)/g
 
 ## Fix-up application icon lookup
-s|^Icon=.*|Icon=\${SNAP}/meta/gui/icon.png|
+s|^Icon=.*|Icon=\${SNAP}/meta/gui/skanlite.svg|

@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# This is the maintainence launcher for the snap, make necessary runtime
+# environment changes to make the snap work here.  You may also insert
+# security confinement/deprecation/obsoletion notice of the snap here.
+#
+# Copyright 2019, 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+# SPDX-License-Identifier: MIT
+
+set \
+    -o errexit \
+    -o errtrace \
+    -o nounset \
+    -o pipefail
+
+shopt \
+    -s nullglob
+
+PATH="${SNAP}/usr/local/bin:${PATH}"
+export ISCAN_FIRMWARE_DIR="${SNAP_USER_COMMON}/firmware"
+
+# Plugin support
+mkdir \
+    --verbose \
+    --parents \
+    "${SNAP_USER_COMMON}/state" \
+    "${SNAP_USER_COMMON}/firmware" \
+    "${SNAP_USER_COMMON}/plugins" \
+    "${SNAP_USER_COMMON}/device"
+
+# for plugin in "${SNAP_USER_COMMON}/plugins"/*.so; do
+#     if strings "${plugin}" | grep -qF runtime-patching; then
+#         continue
+#     fi
+#     printf 'Info: Patching %s...\n' "${plugin}"
+#     patchelf \
+#         --replace-symbol fopen fopen_wrapper \
+#         --add-needed fopen_wrapper.so \
+#         --set-rpath "${SNAP}/runtime-patching" \
+#         "${plugin}"
+#     patchelf \
+#         --replace-symbol stat stat_wrapper \
+#         --add-needed stat_wrapper.so \
+#         --set-rpath "${SNAP}/runtime-patching" \
+#         "${plugin}"
+#     patchelf \
+#         --replace-symbol __xstat __xstat_wrapper \
+#         --add-needed __xstat_wrapper.so \
+#         --set-rpath "${SNAP}/runtime-patching" \
+#         "${plugin}"
+# done
+
+# Finally run the next part of the command chain
+exec "${@}"

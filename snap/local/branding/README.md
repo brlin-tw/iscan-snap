@@ -1,5 +1,3 @@
- 
-
 # branding
 
 This folder contains the branding assets of the snaps in the App. Store, let your application stand out of others by implementing banners, banner icon etc.
@@ -16,7 +14,7 @@ The file should be named as `banner-icon.{jpg,png}`.
 
 ## Banner icon
 
-If uploaded, the banner icon will be overlayed on top of the banner on 
+If uploaded, the banner icon will be overlayed on top of the banner on
 the left of the banner image, when displayed in GNOME Software.
 
 Example banner icon:  

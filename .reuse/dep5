@@ -1,0 +1,42 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Unofficial Snap Packaging for Image Scan! for Linux (V2, UNOFFICIAL)
+Upstream-Contact: 林博仁(Buo-ren, Lin) <https://github.com/brlin-tw/iscan-snap/issues>
+Source: https://github.com/brlin-tw/iscan-snap
+
+# Sample paragraph, commented out:
+#
+# Files: src/*
+# Copyright: $YEAR $NAME <$CONTACT>
+# License: ...
+
+Files:
+ README.md
+ */README.md
+Copyright: 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+License: MIT
+
+Files:
+ snap/gui/skanlite.svg
+Copyright: 2019 KDE <https://github.com/KDE/breeze-icons>
+License: LGPL-3.0-or-later
+
+Files:
+ snap/local/buildtime-patching/jpegstream.cc.patch
+Copyright: 2016 Unknown <https://aur.archlinux.org/cgit/aur.git/tree/jpegstream.cc.patch?h=iscan>
+License: LicenseRef-AUR
+
+Files:
+ snap/local/buildtime-patching/libpng15.patch
+Copyright: 2012 Fabio Castelli <https://aur.archlinux.org/cgit/aur.git/tree/libpng15.patch?h=iscan>
+License: LicenseRef-AUR
+
+Files:
+ snap/local/buildtime-patching/hain01commits2dip-obj.patch
+Copyright: 2012 Henrik Andersson <https://github.com/hean01>
+License: GPL-2.0-or-later
+
+Files:
+ snap/local/buildtime-patching/iscan-2.30.4.2-c99.patch
+ snap/local/buildtime-patching/iscan-2.30.3_fix-sscanf-modifier-in-cfg-obj.patch
+Copyright: Ivan Zenin <https://aur.archlinux.org/packages/iscan>
+License: LicenseRef-AUR
