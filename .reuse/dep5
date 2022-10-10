@@ -12,6 +12,7 @@ Source: https://github.com/brlin-tw/iscan-snap
 Files:
  README.md
  */README.md
+ snap/local/screenshots/*.png
 Copyright: 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
 License: MIT
 

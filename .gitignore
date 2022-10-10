@@ -56,9 +56,9 @@
 *.zip
 
 # Don't track binary image files
-*.bmp
-*.jpg
-*.png
+#*.bmp
+#*.jpg
+#*.png
 
 # Don't track common export formats from Markdown
 *.doc?
