@@ -97,7 +97,7 @@ The esmod library, although shipped with a copy of the EPSON END USER
 SOFTWARE LICENSE(/non-free/COPYING.EPSON.en.txt) claiming:
 
 <!-- markdownlint-disable-next-line ol-prefix list-marker-space -->
-> 3.     Other Rights and Limitations.  You agree not to modify, adapt or
+> 3. \ \ \ \ Other Rights and Limitations.  You agree not to modify, adapt or
 > translate the Software and further agree not to attempt to reverse
 > engineer, decompile, disassemble or otherwise attempt to discover the
 > source code of the Software.  **You may not rent, lease, distribute,
