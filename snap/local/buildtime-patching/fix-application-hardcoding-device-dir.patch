@@ -1,0 +1,47 @@
+This patch changes the loading logic of the device info directory to 
+fallbacking to SNAP_USER_COMMON to allow registering non-free plugins.
+
+Copyright 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+SPDX-License-Identifier: MIT
+
+diff -ur iscan-2.30.4/backend/model-info.c iscan-2.30.4.patched/backend/model-info.c
+--- iscan-2.30.4/backend/model-info.c	2017-03-13 17:16:26.000000000 +0800
++++ iscan-2.30.4.patched/backend/model-info.c	2022-10-11 09:21:27.471778670 +0800
+@@ -70,6 +70,7 @@
+ 
+ #include <stdlib.h>
+ #include <time.h>
++#include <stdlib.h>
+ 
+ #include "list.h"
+ #include "message.h"
+@@ -550,10 +551,28 @@
+   if (!hex_name) return SANE_STATUS_NO_MEM;
+ 
+   path_name = get_path_name (hex_name, NULL, 0);
+-  delete (hex_name);            /* no longer needed */
+ 
+   if (!path_name) return SANE_STATUS_NO_MEM;
+ 
++  FILE *test = NULL;
++  test = fopen(path_name, "r");
++  if (!test){
++      delete (path_name);
++
++      /* WORKAROUND: Use SNAP_USER_COMMON directory for local
++       * state to allow user registering non-free plugins */
++      char* snap_user_common_dir = getenv ("SNAP_USER_COMMON");
++      int snap_user_common_dir_length = strlen (snap_user_common_dir);
++      int path_size = snap_user_common_dir_length + strlen ("/device/") + strlen(hex_name) + strlen (".xml") + 1;
++      char* user_device_file_path = (char*) malloc (path_size);
++      strcpy (user_device_file_path, snap_user_common_dir);
++      strcat (user_device_file_path, "/device/");
++      strcat (user_device_file_path, hex_name);
++      strcat (user_device_file_path, ".xml");
++      path_name = user_device_file_path;
++  }
++  delete (hex_name);            /* no longer needed */
++
+   log_data ("%s", path_name);
+ 
+   doc = xmlReadFile (path_name, NULL,

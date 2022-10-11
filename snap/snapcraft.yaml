@@ -301,6 +301,9 @@ parts:
       patch \
         --strip=1 \
         <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-package-library-dir.patch"
+      patch \
+        --strip=1 \
+        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-device-dir.patch"
 
       # add fix for CXX ABI different than 1002
       ln -s libesmod-x86_64.c2.so non-free/libesmod-x86_64.so
