@@ -414,11 +414,11 @@ plugs:
     interface: content
     target: $SNAP/share/icons
     default-provider: gtk-common-themes:icon-themes
-  gtk2-config:
-    interface: personal-files
-    read:
-      - $HOME/.gtkrc-2.0
-      - $HOME/.config/gtkrc-2.0
+  #gtk2-config:
+    #interface: personal-files
+    #read:
+      #- $HOME/.gtkrc-2.0
+      #- $HOME/.config/gtkrc-2.0
 
   # Allow sysfs device traversal
   hardware-observe:
