@@ -43,18 +43,21 @@ init(){
         esac
     done
 
-    if ! git describe --always &>/dev/null; then
-        upstream_version=2.30.4-2+data1.39.2-1
-    else
-        upstream_version="$(
-            git \
-                describe \
-                --always \
-                --dirty=-d \
-                --tags \
-            | sed s/^v//
-        )"
-    fi
+    iscan_version="$(
+        grep \
+            --only-matching \
+            --perl-regexp \
+            '(?<=iscan_)\d+\.\d+\.\d+' \
+            "${SNAPCRAFT_PROJECT_DIR}/snap/snapcraft.yaml"
+    )"
+    iscan_data_version="$(
+        grep \
+            --only-matching \
+            --perl-regexp \
+            '(?<=iscan-data_)\d+\.\d+\.\d+' \
+            "${SNAPCRAFT_PROJECT_DIR}/snap/snapcraft.yaml"
+    )"
+    upstream_version="${iscan_version}+data${iscan_data_version}"
 
     packaging_revision="$(
         git \
