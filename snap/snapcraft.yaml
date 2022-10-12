@@ -24,34 +24,34 @@ name: iscan
 title: Image Scan! for Linux (V2, UNOFFICIAL)
 summary: Graphical scanner utility for Epson scanners
 description: |
-    Image Scan! is a graphical scanner utility for people that do not
-    need all the bells and whistles provided by several of the other
-    utilities out there (xsane, QuiteInsane, Kooka).
+  Image Scan! is a graphical scanner utility for people that do not
+  need all the bells and whistles provided by several of the other
+  utilities out there (xsane, QuiteInsane, Kooka).
 
-    At the moment it only supports SEIKO EPSON devices.  However, the
-    device driver it provides can be used by any other SANE standard
-    compliant scanner utility.
+  At the moment it only supports SEIKO EPSON devices.  However, the
+  device driver it provides can be used by any other SANE standard
+  compliant scanner utility.
 
-    Note that several scanners require a non-free plugin before they
-    can be used with this software.  Using a scanner directly through
-    a network interface also requires a non-free plugin.
+  Note that several scanners require a non-free plugin before they
+  can be used with this software.  Using a scanner directly through
+  a network interface also requires a non-free plugin.
 
-    ## Packager's note
+  ## Packager's note
 
-    This is the old, obsoleted version of the Image Scan! for Linux,
-    which is in turn superseded by the following products:
+  This is the old, obsoleted version of the Image Scan! for Linux,
+  which is in turn superseded by the following products:
 
-    * Image Scan v3 (codename: Utsushi)
-    * Epson Scan 2
+  * Image Scan v3 (codename: Utsushi)
+  * Epson Scan 2
 
-    The motivation of building this is that the packager felt this
-    version to be more polished and less bugs while using.
+  The motivation of building this is that the packager felt this
+  version to be more polished and less bugs while using.
 
-    This is NOT an official distribution of Image Scan! for Linux,
-    refer to the project's own issue tracker for support:
+  This is NOT an official distribution of Image Scan! for Linux,
+  refer to the project's own issue tracker for support:
 
-    Issues · brlin-tw/iscan-snap
-    https://github.com/brlin-tw/iscan-snap/issues
+  Issues · brlin-tw/iscan-snap
+  https://github.com/brlin-tw/iscan-snap/issues
 
 # The path of icon to represent the snap, relative to the source tree directory
 # Only PNG or SVG image is supported, dimension must be greater than 256x256px
