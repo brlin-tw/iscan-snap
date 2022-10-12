@@ -89,9 +89,11 @@ The built snap, however, is licensing-wise problematic as it constitutes
 the following materials:
 
 * Most of the Image Scan! for Linux V2 application(GPLv2+)
-* The non-free, esmod library(EPSON END USER SOFTWARE LICENSE)
-* The non-free, optional driver support plugins, firmware data, and
-  other resources(EPSON END USER SOFTWARE LICENSE)
+* The non-free, conditionally redistributable esmod library(EPSON END
+  USER SOFTWARE LICENSE with special exception that allows distributing
+  linked combination of Image Scan! for Linux and esmod)
+* The non-free, non-redistributable optional driver support plugins,
+  firmware data, and other resources(EPSON END USER SOFTWARE LICENSE)
 
 The esmod library, although shipped with a copy of the EPSON END USER
 SOFTWARE LICENSE(/non-free/COPYING.EPSON.en.txt) claiming:
