@@ -45,7 +45,7 @@ if ! test -e "${epson_end_user_software_license_read_marker_file}"; then
             --width=640 \
             --text-info \
             --checkbox='/usr/local/share/doc/iscan/COPYING.EPSON.en.txt' \
-            --ok-label='Continue'
+            --ok-label='Continue'; then
         exit 1
     else
         touch "${epson_end_user_software_license_read_marker_file}"
