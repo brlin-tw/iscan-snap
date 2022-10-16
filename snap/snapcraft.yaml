@@ -149,6 +149,21 @@ parts:
     prime:
       - -*
 
+  # Utilities that improve the snap user experience
+  utilities:
+    source: snap/local/utilities
+    plugin: dump
+    organize:
+      '*': bin/
+    stage:
+      - -bin/README.*
+
+  utilities-deps:
+    plugin: nil
+    stage-packages:
+      - curl
+      - dpkg
+
   # This part installs the `desktop-launch` script which initialises desktop
   # features such as fonts, themes and the XDG environment. It also installs
   # the GTK2 runtime libraries.
@@ -409,6 +424,19 @@ apps:
   registry:
     command: usr/local/sbin/iscan-registry
 
+  install-nonfree-plugins:
+    command: bin/install-non-free-plugins.sh
+
+    # The commands that are run, in order, before running the one specified by the `command` key
+    command-chain:
+      - bin/desktop-launch
+      - bin/iscan-launch
+
+    environment:
+      GTK_PATH: $SNAP/lib/gtk-2.0
+      GTK_DATA_PREFIX: $SNAP
+      XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
+
 # Filesystem workarounds for applications that hardcode their paths
 layout:
   /usr/local/share/iscan-data:
@@ -468,8 +496,8 @@ plugs:
     #read:
       #- /etc/iscan
 
-  # Network access
-  #network:
+  # Network access: For installing plugins
+  network:
 
   # Allow raw USB interface access
   raw-usb:
