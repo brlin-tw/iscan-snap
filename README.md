@@ -151,3 +151,7 @@ shipping them in the snap package.
   For ltrace(1) usage
 * ltrace(1) manpage  
   For debugging possible hardcoded paths.
+* [Zenity Manual](https://help.gnome.org/users/zenity/stable/index.html.en)  
+  For usage of the Zenity dialogs
+* [The Pango Markup Language](https://web.archive.org/web/20201028224156/https://developer.gnome.org/pygtk/stable/pango-markup-language.html)  
+  For text formatting in Zenity info dialogs
