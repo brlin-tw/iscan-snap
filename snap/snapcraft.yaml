@@ -327,6 +327,18 @@ parts:
         iscan.desktop \
         "${SNAPCRAFT_PART_INSTALL}/usr/local/share/applications/"
 
+      # Install EPSON's non-free enduser license
+      install \
+        --directory \
+        --mode 0755 \
+        --verbose \
+        "${SNAPCRAFT_PART_INSTALL}/usr/local/share/doc/iscan/"
+      install \
+        --mode 0644 \
+        --verbose \
+        non-free/COPYING.EPSON.*.txt \
+        "${SNAPCRAFT_PART_INSTALL}/usr/local/share/doc/iscan/"
+
     override-prime: |
       set \
         -o nounset
