@@ -191,6 +191,10 @@ parts:
     plugin: nil
     stage-snaps:
       - zenity-integration
+    stage-packages:
+      - libgtk-3-0
+      - libnotify4
+      - libwebkit2gtk-4.0-37
 
   # ltrace for runtime-patching debugging
   # NOTE: For some reason it only be usable when the snap is install with --dev-mode
