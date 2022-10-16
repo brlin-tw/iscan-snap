@@ -53,6 +53,18 @@ description: |
   Issues · brlin-tw/iscan-snap
   https://github.com/brlin-tw/iscan-snap/issues
 
+  ### Licensing note
+
+  This package is comprised of two main components:
+
+  * Image Scan! for Linux (V2, licensed under GPL v2)
+  * EPSON's esmod API library (Proprietary, licensed under EPSON END
+    USER SOFTWARE LICENSE)
+
+  The latter component is the reason why the entire package is marked
+  as 'Proprietary', and using of this distribution implies that you
+  accept the EPSON END USER SOFTWARE LICENSE.
+
 # The path of icon to represent the snap, relative to the source tree directory
 # Only PNG or SVG image is supported, dimension must be greater than 256x256px
 #icon: snap/gui/iscan.png
@@ -62,7 +74,7 @@ description: |
 # https://spdx.org/spdx-specification-21-web-version
 # Supported expressions:
 # https://github.com/snapcore/snapd/blob/HEAD/spdx/licenses.go
-license: GPL-2.0-only
+license: Proprietary
 
 # Version string just for humans, typically '1.2+git' or '1.3.2'
 # The wrapping single quotes are often required to avoid the version string
