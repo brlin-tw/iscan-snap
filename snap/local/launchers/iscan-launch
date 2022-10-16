@@ -52,5 +52,15 @@ if ! test -e "${epson_end_user_software_license_read_marker_file}"; then
     fi
 fi
 
+udev_notice_read_marker_file="${SNAP_USER_COMMON}/skip-udev-notice.marker"
+if ! test -e "${udev_notice_read_marker_file}"; then
+    zenity \
+        --title 'Manual operation required: Udev rules' \
+        --width=640 \
+        --info \
+        --ok-label='Continue' \
+        --text "Due to snapd's limitations the snap is unable to install the required udev rules to enable the snap to access the scanners.\\n\\nPlease run the following commands in the terminal to fix it manually:\\n\\n<tt>    iscan.make-policy-file --mode udev --desc-file /snap/iscan/current/usr/local/share/iscan-data/epkowa.desc --force -o 60-iscan.rules\\n    sudo install --owner=root --group=root --mode 0644 60-iscan.rules /etc/udev/rules.d/\\n    sudo udevadm control --reload</tt>\\n\\nThis dialog will only display once, to see it again remove the ${udev_notice_read_marker_file} marker file and relaunch the application."
+fi
+
 # Finally run the next part of the command chain
 exec "${@}"
