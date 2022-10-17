@@ -43,8 +43,10 @@ if ! test -e "${epson_end_user_software_license_read_marker_file}"; then
     if ! zenity \
             --title='EPSON END USER SOFTWARE LICENSE' \
             --width=640 \
+            --height=360 \
             --text-info \
-            --checkbox='/usr/local/share/doc/iscan/COPYING.EPSON.en.txt' \
+            --filename="${SNAP}/usr/local/share/doc/iscan/COPYING.EPSON.en.txt" \
+            --checkbox='I read and accept the terms.' \
             --ok-label='Continue'; then
         exit 1
     else
