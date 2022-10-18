@@ -9,7 +9,6 @@ SNAP_USER_COMMON="${SNAP_USER_COMMON:-"${HOME}/snap/iscan/common"}"
 declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
     [cx4400]=https://download2.ebz.epson.net/iscan/plugin/cx4400/deb/x64/iscan-cx4400-bundle-2.30.4.x64.deb.tar.gz
     [ds-30]=https://download2.ebz.epson.net/iscan/plugin/ds-30/deb/x64/iscan-ds-30-bundle-2.30.4.x64.deb.tar.gz
-    [gt-x770]=https://download2.ebz.epson.net/iscan/plugin/gt-x770/deb/x64/iscan-gt-x770-bundle-2.30.4.x64.deb.tar.gz
     [gt-1500]=https://download2.ebz.epson.net/iscan/plugin/gt-1500/deb/x64/iscan-gt-1500-bundle-2.30.4.x64.deb.tar.gz
     [gt-f500]=http://download.ebz.epson.net/dsc/f/01/00/01/58/54/1899fd522665e4b1c80fe95252838994192d5207/iscan-plugin-gt-f500-1.0.0-1.c2.i386.rpm
     [gt-f670]=https://download2.ebz.epson.net/iscan/plugin/gt-f670/deb/x64/iscan-gt-f670-bundle-2.30.4.x64.deb.tar.gz
@@ -18,6 +17,7 @@ declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
     [gt-s600]=https://download2.ebz.epson.net/iscan/plugin/gt-s600/deb/x64/iscan-gt-s600-bundle-2.30.4.x64.deb.tar.gz
     [gt-s650]=https://download2.ebz.epson.net/iscan/plugin/gt-s650/deb/x64/iscan-gt-s650-bundle-2.30.4.x64.deb.tar.gz
     [gt-s80]=https://download2.ebz.epson.net/iscan/plugin/gt-s80/deb/x64/iscan-gt-s80-bundle-2.30.4.x64.deb.tar.gz
+    [gt-x770]=https://download2.ebz.epson.net/iscan/plugin/gt-x770/deb/x64/iscan-gt-x770-bundle-2.30.4.x64.deb.tar.gz
 )
 
 trap trap_exit EXIT
