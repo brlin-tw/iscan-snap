@@ -6,6 +6,14 @@ set -eux
 shopt -s nullglob
 
 SNAP_USER_COMMON="${SNAP_USER_COMMON:-"${HOME}/snap/iscan/common"}"
+declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
+    [gt-f670]=https://download2.ebz.epson.net/iscan/plugin/gt-f670/deb/x64/iscan-gt-f670-bundle-2.30.4.x64.deb.tar.gz
+    [gt-f700]=https://download2.ebz.epson.net/iscan/plugin/gt-f700/deb/x64/iscan-gt-f700-bundle-2.30.4.x64.deb.tar.gz
+    [gt-f720]=https://download2.ebz.epson.net/iscan/plugin/gt-f720/deb/x64/iscan-gt-f720-bundle-2.30.4.x64.deb.tar.gz
+    [gt-s600]=https://download2.ebz.epson.net/iscan/plugin/gt-s600/deb/x64/iscan-gt-s600-bundle-2.30.4.x64.deb.tar.gz
+    [gt-s650]=https://download2.ebz.epson.net/iscan/plugin/gt-s650/deb/x64/iscan-gt-s650-bundle-2.30.4.x64.deb.tar.gz
+)
+
 script_filename="${BASH_SOURCE##*/}"
 script_name="${script_filename%%.*}"
 plugins="$(
@@ -52,10 +60,11 @@ pushd "${temp_dir}" >/dev/null
 for plugin in ${plugins}; do
     curl \
         --location \
+        --remote-header-name \
         --remote-name \
         --verbose \
         --fail \
-        "https://download2.ebz.epson.net/iscan/plugin/${plugin}/deb/x64/iscan-${plugin}-bundle-2.30.4.x64.deb.tar.gz"
+        "${PLUGIN_PACKAGE_DOWNLOAD_URLS["${plugin}"]}"
     tar \
         --extract \
         --verbose \
