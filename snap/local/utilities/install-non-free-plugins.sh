@@ -7,6 +7,7 @@ shopt -s nullglob
 
 SNAP_USER_COMMON="${SNAP_USER_COMMON:-"${HOME}/snap/iscan/common"}"
 declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
+    [ds-30]=https://download2.ebz.epson.net/iscan/plugin/ds-30/deb/x64/iscan-ds-30-bundle-2.30.4.x64.deb.tar.gz
     [gt-x770]=https://download2.ebz.epson.net/iscan/plugin/gt-x770/deb/x64/iscan-gt-x770-bundle-2.30.4.x64.deb.tar.gz
     [gt-1500]=https://download2.ebz.epson.net/iscan/plugin/gt-1500/deb/x64/iscan-gt-1500-bundle-2.30.4.x64.deb.tar.gz
     [gt-f500]=http://download.ebz.epson.net/dsc/f/01/00/01/58/54/1899fd522665e4b1c80fe95252838994192d5207/iscan-plugin-gt-f500-1.0.0-1.c2.i386.rpm
@@ -207,6 +208,7 @@ plugins="$(
         --checklist \
         --separator=' ' \
         --print-column=2 \
+        FALSE ds-30 'WorkForce DS-30' DS-30 \
         FALSE gt-x770 'Perfection V500 Photo' GT-X770 \
         FALSE gt-1500 GT-1500 GT-D1000 \
         FALSE gt-f500 'Perfection 2480/2580 Photo' GT-F500/GT-F550 \
