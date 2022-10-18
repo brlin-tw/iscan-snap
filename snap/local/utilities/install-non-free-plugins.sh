@@ -21,6 +21,8 @@ declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
     [gt-x770]=https://download2.ebz.epson.net/iscan/plugin/gt-x770/deb/x64/iscan-gt-x770-bundle-2.30.4.x64.deb.tar.gz
     [gt-x820]=https://download2.ebz.epson.net/iscan/plugin/gt-x820/deb/x64/iscan-gt-x820-bundle-2.30.4.x64.deb.tar.gz
     [perfection-v330]=https://download2.ebz.epson.net/iscan/plugin/perfection-v330/deb/x64/iscan-perfection-v330-bundle-2.30.4.x64.deb.tar.gz
+    [perfection-v370]=https://download2.ebz.epson.net/iscan/plugin/perfection-v370/deb/x64/iscan-perfection-v370-bundle-2.30.4.x64.deb.tar.gz
+    [perfection-v550]=https://download2.ebz.epson.net/iscan/plugin/perfection-v550/deb/x64/iscan-perfection-v550-bundle-2.30.4.x64.deb.tar.gz
 )
 
 trap trap_exit EXIT
@@ -220,6 +222,8 @@ zenity_list_data=(
     FALSE gt-x770 'Perfection V500 Photo' GT-X770
     FALSE gt-x820 'Perfection V600 photo' GT-X820
     FALSE perfection-v330 'Perfection V33/V330 Photo' GT-F730/GT-S630
+    FALSE perfection-v370 'Perfection V37/V370' GT-F740/GT-S640
+    FALSE perfection-v550 "Perfection V550 Photo" N/A
 )
 plugins="$(
     zenity \
