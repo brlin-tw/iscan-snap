@@ -155,5 +155,7 @@ shipping them in the snap package.
   For usage of the Zenity dialogs
 * [The Pango Markup Language](https://web.archive.org/web/20201028224156/https://developer.gnome.org/pygtk/stable/pango-markup-language.html)  
   For text formatting in Zenity info dialogs
+* [How do I extract a RPM file? - Ask Ubuntu](https://askubuntu.com/questions/52230/how-do-i-extract-a-rpm-file)  
+  For info on how to extract a RPM package in Ubuntu
 * [Short Tip: Extract pre/post-install scripts from a rpm – /home/liquidat](https://liquidat.wordpress.com/2008/08/26/short-tip-extract-prepost-install-scripts-from-a-rpm/)  
   For info on how to extract maintenance scripts from a RPM package
