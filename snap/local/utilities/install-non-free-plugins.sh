@@ -17,6 +17,7 @@ declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
     [gt-s600]=https://download2.ebz.epson.net/iscan/plugin/gt-s600/deb/x64/iscan-gt-s600-bundle-2.30.4.x64.deb.tar.gz
     [gt-s650]=https://download2.ebz.epson.net/iscan/plugin/gt-s650/deb/x64/iscan-gt-s650-bundle-2.30.4.x64.deb.tar.gz
     [gt-s80]=https://download2.ebz.epson.net/iscan/plugin/gt-s80/deb/x64/iscan-gt-s80-bundle-2.30.4.x64.deb.tar.gz
+    [gt-x750]=https://download2.ebz.epson.net/iscan/plugin/gt-x750/deb/x64/iscan-gt-x750-bundle-2.30.4.x64.deb.tar.gz
     [gt-x770]=https://download2.ebz.epson.net/iscan/plugin/gt-x770/deb/x64/iscan-gt-x770-bundle-2.30.4.x64.deb.tar.gz
 )
 
@@ -213,6 +214,7 @@ zenity_list_data=(
     FALSE gt-s600 'Perfection V10/V100 Photo' GT-S600/GT-F650
     FALSE gt-s650 'Perfection V19/V39' GT-S650
     FALSE gt-s80 'GT-S50/GT-S55/GT-S80/GT-S85' ES-D200/ES-D350/ES-D400
+    FALSE gt-x750 'Perfection 4490 Photo' GT-X750
     FALSE gt-x770 'Perfection V500 Photo' GT-X770
 )
 plugins="$(
