@@ -213,7 +213,6 @@ register_iscan_plugin(){
             exit 99
         ;;
     esac
-
 }
 
 for plugin in ${plugins}; do
