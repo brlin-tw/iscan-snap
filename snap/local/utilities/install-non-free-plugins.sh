@@ -12,6 +12,7 @@ plugins="$(
     zenity \
         --title 'Install non-free EPSON scanner plugins' \
         --width=640 \
+        --height=360 \
         --list \
         --column='Install?' --column 'Plugin code' --column 'Overseas model name' --column 'Japan model name' \
         --checklist \
