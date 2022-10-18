@@ -214,7 +214,6 @@ plugins="$(
         --print-column=2 \
         FALSE cx4400 'Stylus CX4300/CX4400/CX5500/CX5600/DX4400' 'N/A' \
         FALSE ds-30 'WorkForce DS-30' DS-30 \
-        FALSE gt-x770 'Perfection V500 Photo' GT-X770 \
         FALSE gt-1500 GT-1500 GT-D1000 \
         FALSE gt-f500 'Perfection 2480/2580 Photo' GT-F500/GT-F550 \
         FALSE gt-f670 'Perfection Photo V200' GT-F670 \
@@ -222,7 +221,8 @@ plugins="$(
         FALSE gt-f720 'Perfection V30/V300 Photo' GT-S620/GT-F720 \
         FALSE gt-s600 'Perfection V10/V100 Photo' GT-S600/GT-F650 \
         FALSE gt-s650 'Perfection V19/V39' GT-S650 \
-        FALSE gt-s80 'GT-S50/GT-S55/GT-S80/GT-S85' ES-D200/ES-D350/ES-D400
+        FALSE gt-s80 'GT-S50/GT-S55/GT-S80/GT-S85' ES-D200/ES-D350/ES-D400 \
+        FALSE gt-x770 'Perfection V500 Photo' GT-X770
 )"
 
 for plugin in ${plugins}; do
