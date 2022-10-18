@@ -191,7 +191,7 @@ register_iscan_plugin(){
                 gt-f500)
                     iscan-registry \
                         --add interpreter usb 0x04b8 0x0121 \
-                        ${SNAP_USER_COMMON}/plugins/libesint41 \
+                        "${SNAP_USER_COMMON}/plugins/libesint41" \
                         /usr/share/iscan/esfw41.bin
                 ;;
                 *)
