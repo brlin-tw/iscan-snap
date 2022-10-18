@@ -32,17 +32,13 @@ plugins="$(
         FALSE gt-s600 'Perfection V10/V100 Photo' GT-S600/GT-F650 \
         FALSE gt-s650 'Perfection V19/V39' GT-S650
 )"
-temp_dir="$(
-    mktemp \
-        --directory \
-        --tmpdir \
-        "${script_name}.XXX"
-)"
+
 trap trap_exit EXIT
 trap_exit(){
-    if test -e "${temp_dir}"; then
+    if test -v temp_dir \
+        && test -e "${temp_dir}"; then
         rm \
-            -r \
+            -rf \
             "${temp_dir}"
     fi
 }
@@ -56,27 +52,83 @@ trap_err(){
         --text 'Install terminated prematurely with errors, please report.'
 }
 
-pushd "${temp_dir}" >/dev/null
-for plugin in ${plugins}; do
-    curl \
-        --location \
-        --remote-header-name \
-        --remote-name \
-        --verbose \
-        --fail \
-        "${PLUGIN_PACKAGE_DOWNLOAD_URLS["${plugin}"]}"
-    tar \
-        --extract \
-        --verbose \
-        --file "${temp_dir}/iscan-${plugin}-bundle-2.30.4.x64.deb.tar.gz"
-    for possible_plugin_package in \
-        "iscan-${plugin}-bundle-2.30.4.x64.deb/plugins/iscan-plugin-${plugin}_"*"_amd64.deb" \
-        "iscan-${plugin}-bundle-2.30.4.x64.deb/plugins/esci-interpreter-${plugin}_"*"_amd64.deb"; do
-        dpkg-deb \
-            --vextract \
-            "${possible_plugin_package}" \
-            extract
-    done
+# Download plugin package from _plugin_package_download_url_, and place
+# it in _download_dir_
+download_plugin_package(){
+    local plugin_package_download_url="${1}"; shift
+    local download_dir="${1}"; shift
+
+    pushd "${download_dir}" >/dev/null
+        curl \
+            --location \
+            --remote-header-name \
+            --remote-name \
+            --verbose \
+            --fail \
+            "${plugin_package_download_url}"
+    popd >/dev/null
+}
+
+# Detect plugin package type(deb_bundle/rpm) from _package_filename_
+detect_plugin_package_type(){
+    local package_filename="${1}"; shift
+
+    case "${package_filename}" in
+        iscan-*-bundle-*.*.deb.tar.gz)
+            printf deb_bundle
+        ;;
+        *.rpm)
+            printf rpm
+        ;;
+        *)
+            printf unknown
+        ;;
+    esac
+}
+
+# Unpack _bundle_package_ that contains the plugin package to the
+# _bundle_unpack_dir_
+unpack_deb_bundle_package(){
+    local bundle_package="${1}"; shift
+    local bundle_unpack_dir="${1}"; shift
+
+    pushd "${bundle_unpack_dir}" >/dev/null
+        tar \
+            --extract \
+            --verbose \
+            --file "${bundle_package}"
+    popd >/dev/null
+}
+
+# Unpack _plugin_package_(which should be a FHS-like file system tree)
+# with _package_type_ to _extract_dir_
+unpack_plugin_package(){
+    local plugin_package="${1}"; shift
+    local package_type="${1}"; shift
+    local extract_dir="${1}"; shift
+
+    case "${package_type}" in
+        deb_bundle)
+            dpkg-deb \
+                --vextract \
+                "${plugin_package}" \
+                "${extract_dir}"
+        ;;
+        rpm)
+            printf 'FATAL: Not implemented yet.\n' 1>&2
+            exit 99
+        ;;
+        *)
+            printf 'FATAL: Design error, report bug.\n' 1>&2
+            exit 99
+        ;;
+    esac
+}
+
+# Install _plugin_files_ from _extract_dir_
+install_plugin_files(){
+    local extract_dir="${1}"; shift
+
     for plugin_file in extract/usr/lib/iscan/*.so*; do
     mv \
         --verbose \
@@ -84,29 +136,28 @@ for plugin in ${plugins}; do
         "${SNAP_USER_COMMON}/plugins/"
     done
     for firmware_file in \
-        extract/usr/share/iscan/*.bin \
-        extract/usr/share/esci/*.bin; do
-    mv \
-        --verbose \
-        "${firmware_file}" \
-        "${SNAP_USER_COMMON}/firmware/"
+        "${extract_dir}/usr/share/iscan/"*.bin \
+        "${extract_dir}/usr/share/esci/"*.bin; do
+        mv \
+            --verbose \
+            "${firmware_file}" \
+            "${SNAP_USER_COMMON}/firmware/"
     done
-    for device_file in extract/usr/share/iscan-data/device/*.xml; do
+    for device_file in "${extract_dir}/usr/share/iscan-data/device/"*.xml; do
         mv \
             --verbose \
             "${device_file}" \
             "${SNAP_USER_COMMON}/device/"
     done
-    for possible_plugin_package in \
-        "iscan-${plugin}-bundle-2.30.4.x64.deb/plugins/iscan-plugin-${plugin}_"*"_amd64.deb" \
-        "iscan-${plugin}-bundle-2.30.4.x64.deb/plugins/esci-interpreter-${plugin}_"*"_amd64.deb"; do
-        dpkg-deb \
-            --ctrl-tarfile \
-            "${possible_plugin_package}" \
-            | tar \
-                --extract \
-                ./postinst
-    done
+}
+
+# Register plugin to iscan, for debian bundle package we can rely on
+# its post-installation script
+register_iscan_plugin(){
+    local plugin="${1}"; shift
+    local plugin_package="${1}"; shift
+    local package_type="${1}"; shift
+    local temp_dir="${1}"; shift
 
     # Remove duplicate entries
     sed \
@@ -114,12 +165,106 @@ for plugin in ${plugins}; do
         --expression "/${plugin}/d" \
         "${SNAP_USER_COMMON}/state/interpreter"
 
-    sed \
-        --in-place \
-        --expression "s@/usr/lib/iscan@${SNAP_USER_COMMON}/plugins@g" \
-        --expression "s@/usr/lib/esci@${SNAP_USER_COMMON}/plugins@g" \
-        postinst
-    ./postinst
+    case "${package_type}" in
+        deb_bundle)
+            pushd "${temp_dir}" >/dev/null
+                dpkg-deb \
+                    --ctrl-tarfile \
+                    "${plugin_package}" \
+                    | tar \
+                        --extract \
+                        ./postinst
+
+                sed \
+                    --in-place \
+                    --expression "s@/usr/lib/iscan@${SNAP_USER_COMMON}/plugins@g" \
+                    --expression "s@/usr/lib/esci@${SNAP_USER_COMMON}/plugins@g" \
+                    postinst
+                ./postinst
+            popd >/dev/null
+        ;;
+        rpm)
+            printf 'FATAL: Not implemented yet.\n' 1>&2
+            exit 99
+        ;;
+        *)
+            printf 'FATAL: Design error, report bug.\n' 1>&2
+            exit 99
+        ;;
+    esac
+
+}
+
+for plugin in ${plugins}; do
+    temp_dir="$(
+        mktemp \
+            --directory \
+            --tmpdir \
+            "${script_name}.${plugin}.XXX"
+    )"
+    package_dir="${temp_dir}/package"
+    bundle_unpack_dir="${temp_dir}/bundle-unpack"
+    extract_dir="${temp_dir}/extract"
+    mkdir \
+        "${package_dir}" \
+        "${bundle_unpack_dir}" \
+        "${extract_dir}"
+
+    plugin_package_download_url="${PLUGIN_PACKAGE_DOWNLOAD_URLS["${plugin}"]}"
+    package_filename="${plugin_package_download_url##*/}"
+    downloaded_plugin_package="${package_dir}/${package_filename}"
+
+    download_plugin_package \
+        "${plugin_package_download_url}" \
+        "${package_dir}"
+
+    package_type="$(detect_plugin_package_type "${package_filename}")"
+    case "${package_type}" in
+        deb_bundle)
+            unpack_deb_bundle_package \
+                "${downloaded_plugin_package}" \
+                "${bundle_unpack_dir}"
+            flag_plugin_package_found=false
+            for possible_plugin_package in \
+                "${bundle_unpack_dir}/iscan-"*"-bundle-"*".deb/plugins/iscan-plugin-"*".deb" \
+                "${bundle_unpack_dir}/iscan-"*"-bundle-"*".deb/plugins/esci-interpreter-"*".deb"; do
+                flag_plugin_package_found=true
+                plugin_package="${possible_plugin_package}"
+            done
+            if test "${flag_plugin_package_found}" == false; then
+                printf 'Error: Unable to locate the plugin package in the bundle package.\n' 1>&2
+                exit 1
+            fi
+        ;;
+        rpm)
+            plugin_package="${downloaded_plugin_package}"
+        ;;
+        unknown)
+            printf 'Error: Plugin package type cannot be determined.\n' 1>&2
+            exit 1
+        ;;
+        *)
+            printf 'FATAL: Design error, report bug.\n' 1>&2
+            exit 99
+        ;;
+    esac
+
+    unpack_plugin_package \
+        "${plugin_package}" \
+        "${package_type}" \
+        "${extract_dir}"
+
+    install_plugin_files \
+        "${extract_dir}"
+
+    register_iscan_plugin \
+        "${plugin}" \
+        "${plugin_package}" \
+        "${package_type}" \
+        "${temp_dir}"
+
+    rm -rf \
+        "${temp_dir}"
 done
 zenity \
     --title 'Info' \
