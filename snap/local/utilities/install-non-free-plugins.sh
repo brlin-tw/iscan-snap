@@ -7,6 +7,7 @@ shopt -s nullglob
 
 SNAP_USER_COMMON="${SNAP_USER_COMMON:-"${HOME}/snap/iscan/common"}"
 declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
+    [gt-1500]=https://download2.ebz.epson.net/iscan/plugin/gt-1500/deb/x64/iscan-gt-1500-bundle-2.30.4.x64.deb.tar.gz
     [gt-f500]=http://download.ebz.epson.net/dsc/f/01/00/01/58/54/1899fd522665e4b1c80fe95252838994192d5207/iscan-plugin-gt-f500-1.0.0-1.c2.i386.rpm
     [gt-f670]=https://download2.ebz.epson.net/iscan/plugin/gt-f670/deb/x64/iscan-gt-f670-bundle-2.30.4.x64.deb.tar.gz
     [gt-f700]=https://download2.ebz.epson.net/iscan/plugin/gt-f700/deb/x64/iscan-gt-f700-bundle-2.30.4.x64.deb.tar.gz
@@ -27,6 +28,7 @@ plugins="$(
         --checklist \
         --separator=' ' \
         --print-column=2 \
+        FALSE gt-1500 GT-1500 GT-D1000 \
         FALSE gt-f500 'Perfection 2480/2580 Photo' GT-F500/GT-F550 \
         FALSE gt-f670 'Perfection Photo V200' GT-F670 \
         FALSE gt-f700 'Perfection V350 Photo' GT-F700 \
