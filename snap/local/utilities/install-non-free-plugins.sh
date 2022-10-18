@@ -16,27 +16,6 @@ declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
     [gt-s650]=https://download2.ebz.epson.net/iscan/plugin/gt-s650/deb/x64/iscan-gt-s650-bundle-2.30.4.x64.deb.tar.gz
 )
 
-script_filename="${BASH_SOURCE##*/}"
-script_name="${script_filename%%.*}"
-plugins="$(
-    zenity \
-        --title 'Install non-free EPSON scanner plugins' \
-        --width=640 \
-        --height=360 \
-        --list \
-        --column='Install?' --column 'Plugin code' --column 'Overseas model name' --column 'Japan model name' \
-        --checklist \
-        --separator=' ' \
-        --print-column=2 \
-        FALSE gt-1500 GT-1500 GT-D1000 \
-        FALSE gt-f500 'Perfection 2480/2580 Photo' GT-F500/GT-F550 \
-        FALSE gt-f670 'Perfection Photo V200' GT-F670 \
-        FALSE gt-f700 'Perfection V350 Photo' GT-F700 \
-        FALSE gt-f720 'Perfection V30/V300 Photo' GT-S620/GT-F720 \
-        FALSE gt-s600 'Perfection V10/V100 Photo' GT-S600/GT-F650 \
-        FALSE gt-s650 'Perfection V19/V39' GT-S650
-)"
-
 trap trap_exit EXIT
 trap_exit(){
     if test -v temp_dir \
@@ -214,6 +193,27 @@ register_iscan_plugin(){
         ;;
     esac
 }
+
+script_filename="${BASH_SOURCE##*/}"
+script_name="${script_filename%%.*}"
+plugins="$(
+    zenity \
+        --title 'Install non-free EPSON scanner plugins' \
+        --width=640 \
+        --height=360 \
+        --list \
+        --column='Install?' --column 'Plugin code' --column 'Overseas model name' --column 'Japan model name' \
+        --checklist \
+        --separator=' ' \
+        --print-column=2 \
+        FALSE gt-1500 GT-1500 GT-D1000 \
+        FALSE gt-f500 'Perfection 2480/2580 Photo' GT-F500/GT-F550 \
+        FALSE gt-f670 'Perfection Photo V200' GT-F670 \
+        FALSE gt-f700 'Perfection V350 Photo' GT-F700 \
+        FALSE gt-f720 'Perfection V30/V300 Photo' GT-S620/GT-F720 \
+        FALSE gt-s600 'Perfection V10/V100 Photo' GT-S600/GT-F650 \
+        FALSE gt-s650 'Perfection V19/V39' GT-S650
+)"
 
 for plugin in ${plugins}; do
     temp_dir="$(
