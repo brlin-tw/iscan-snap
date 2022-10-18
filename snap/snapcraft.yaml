@@ -161,8 +161,10 @@ parts:
   utilities-deps:
     plugin: nil
     stage-packages:
+      - cpio
       - curl
       - dpkg
+      - rpm2cpio
 
   # This part installs the `desktop-launch` script which initialises desktop
   # features such as fonts, themes and the XDG environment. It also installs

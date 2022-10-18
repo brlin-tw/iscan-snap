@@ -7,6 +7,7 @@ shopt -s nullglob
 
 SNAP_USER_COMMON="${SNAP_USER_COMMON:-"${HOME}/snap/iscan/common"}"
 declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
+    [gt-f500]=http://download.ebz.epson.net/dsc/f/01/00/01/58/54/1899fd522665e4b1c80fe95252838994192d5207/iscan-plugin-gt-f500-1.0.0-1.c2.i386.rpm
     [gt-f670]=https://download2.ebz.epson.net/iscan/plugin/gt-f670/deb/x64/iscan-gt-f670-bundle-2.30.4.x64.deb.tar.gz
     [gt-f700]=https://download2.ebz.epson.net/iscan/plugin/gt-f700/deb/x64/iscan-gt-f700-bundle-2.30.4.x64.deb.tar.gz
     [gt-f720]=https://download2.ebz.epson.net/iscan/plugin/gt-f720/deb/x64/iscan-gt-f720-bundle-2.30.4.x64.deb.tar.gz
@@ -26,6 +27,7 @@ plugins="$(
         --checklist \
         --separator=' ' \
         --print-column=2 \
+        FALSE gt-f500 'Perfection 2480/2580 Photo' GT-F500/GT-F550 \
         FALSE gt-f670 'Perfection Photo V200' GT-F670 \
         FALSE gt-f700 'Perfection V350 Photo' GT-F700 \
         FALSE gt-f720 'Perfection V30/V300 Photo' GT-S620/GT-F720 \
@@ -115,8 +117,13 @@ unpack_plugin_package(){
                 "${extract_dir}"
         ;;
         rpm)
-            printf 'FATAL: Not implemented yet.\n' 1>&2
-            exit 99
+            pushd "${extract_dir}" >/dev/null
+                RPMRC=/dev/null \
+                    rpm2cpio "${plugin_package}" \
+                    | cpio \
+                        -i \
+                        --make-directories
+            popd >/dev/null
         ;;
         *)
             printf 'FATAL: Design error, report bug.\n' 1>&2
@@ -184,8 +191,20 @@ register_iscan_plugin(){
             popd >/dev/null
         ;;
         rpm)
-            printf 'FATAL: Not implemented yet.\n' 1>&2
-            exit 99
+            # Some plugins don't include plugin registration scripts,
+            # implement them here
+            case "${plugin}" in
+                gt-f500)
+                    iscan-registry \
+                        --add interpreter usb 0x04b8 0x0121 \
+                        ${SNAP_USER_COMMON}/plugins/libesint41 \
+                        /usr/share/iscan/esfw41.bin
+                ;;
+                *)
+                    printf 'FATAL: Not implemented yet.\n' 1>&2
+                    exit 199
+                ;;
+            esac
         ;;
         *)
             printf 'FATAL: Design error, report bug.\n' 1>&2
