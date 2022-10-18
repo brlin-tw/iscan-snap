@@ -159,10 +159,12 @@ register_iscan_plugin(){
     local temp_dir="${1}"; shift
 
     # Remove duplicate entries
-    sed \
-        --in-place \
-        --expression "/${plugin}/d" \
-        "${SNAP_USER_COMMON}/state/interpreter"
+    if test -e "${SNAP_USER_COMMON}/state/interpreter"; then
+        sed \
+            --in-place \
+            --expression "/${plugin}/d" \
+            "${SNAP_USER_COMMON}/state/interpreter"
+    fi
 
     case "${package_type}" in
         deb_bundle)
