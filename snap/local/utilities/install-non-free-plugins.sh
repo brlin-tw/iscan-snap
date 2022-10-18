@@ -227,8 +227,12 @@ plugins="$(
         --checklist \
         --separator=' ' \
         --print-column=2 \
-        "${zenity_list_data[@]}"
+        "${zenity_list_data[@]}" \
+        || true
 )"
+if test -z "${plugins}"; then
+    exit 0
+fi
 
 for plugin in ${plugins}; do
     temp_dir="$(
