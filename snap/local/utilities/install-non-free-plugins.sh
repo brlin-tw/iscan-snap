@@ -119,7 +119,9 @@ unpack_plugin_package(){
 install_plugin_files(){
     local extract_dir="${1}"; shift
 
-    for plugin_file in "${extract_dir}/usr/lib/iscan/"*.so*; do
+    for plugin_file in \
+        "${extract_dir}/usr/lib/iscan/"*.so* \
+        "${extract_dir}/usr/lib/esci/"*.so*; do
     mv \
         --verbose \
         "${plugin_file}" \
