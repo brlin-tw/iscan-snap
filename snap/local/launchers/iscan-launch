@@ -65,5 +65,16 @@ if ! test -e "${udev_notice_read_marker_file}"; then
     touch "${udev_notice_read_marker_file}"
 fi
 
+non_free_plugins_notice_read_marker_file="${SNAP_USER_COMMON}/skip-non-free-plugins-notice.marker"
+if ! test -e "${non_free_plugins_notice_read_marker_file}"; then
+    zenity \
+        --title='About non-free device support plugins' \
+        --width=640 \
+        --info \
+        --ok-label='Continue' \
+        --text="Due to EPSON's license requirements the snap does not include several device support plugins to enable scanning with some of the EPSON scanner models.\\n\\nPlease run the following commands in the terminal to install them:\\n\\n<tt>    iscan.install-nonfree-plugins</tt>\\n\\nThis dialog will only display once, to see it again remove the ${non_free_plugins_notice_read_marker_file} marker file and relaunch the application."
+    touch "${non_free_plugins_notice_read_marker_file}"
+fi
+
 # Finally run the next part of the command chain
 exec "${@}"
