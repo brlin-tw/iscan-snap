@@ -18,6 +18,7 @@ plugins="$(
         --checklist \
         --separator=' ' \
         --print-column=2 \
+        FALSE gt-f670 'Perfection Photo V200' GT-F670 \
         FALSE gt-f700 'Perfection V350 Photo' GT-F700 \
         FALSE gt-f720 'Perfection V30/V300 Photo' GT-S620/GT-F720 \
         FALSE gt-s600 'Perfection V10/V100 Photo' GT-S600/GT-F650 \
