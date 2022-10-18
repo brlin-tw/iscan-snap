@@ -17,6 +17,7 @@ declare -A PLUGIN_PACKAGE_DOWNLOAD_URLS=(
     [gt-f720]=https://download2.ebz.epson.net/iscan/plugin/gt-f720/deb/x64/iscan-gt-f720-bundle-2.30.4.x64.deb.tar.gz
     [gt-s600]=https://download2.ebz.epson.net/iscan/plugin/gt-s600/deb/x64/iscan-gt-s600-bundle-2.30.4.x64.deb.tar.gz
     [gt-s650]=https://download2.ebz.epson.net/iscan/plugin/gt-s650/deb/x64/iscan-gt-s650-bundle-2.30.4.x64.deb.tar.gz
+    [gt-s80]=https://download2.ebz.epson.net/iscan/plugin/gt-s80/deb/x64/iscan-gt-s80-bundle-2.30.4.x64.deb.tar.gz
 )
 
 trap trap_exit EXIT
@@ -220,7 +221,8 @@ plugins="$(
         FALSE gt-f700 'Perfection V350 Photo' GT-F700 \
         FALSE gt-f720 'Perfection V30/V300 Photo' GT-S620/GT-F720 \
         FALSE gt-s600 'Perfection V10/V100 Photo' GT-S600/GT-F650 \
-        FALSE gt-s650 'Perfection V19/V39' GT-S650
+        FALSE gt-s650 'Perfection V19/V39' GT-S650 \
+        FALSE gt-s80 'GT-S50/GT-S55/GT-S80/GT-S85' ES-D200/ES-D350/ES-D400
 )"
 
 for plugin in ${plugins}; do
