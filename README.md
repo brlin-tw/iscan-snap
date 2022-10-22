@@ -159,3 +159,5 @@ shipping them in the snap package.
   For info on how to extract a RPM package in Ubuntu
 * [Short Tip: Extract pre/post-install scripts from a rpm – /home/liquidat](https://liquidat.wordpress.com/2008/08/26/short-tip-extract-prepost-install-scripts-from-a-rpm/)  
   For info on how to extract maintenance scripts from a RPM package
+* [I set variables in a loop that's in a pipeline. Why do they disappear after the loop terminates? Or, why can't I pipe data to read? - BashFAQ/024 - Greg's Wiki](http://mywiki.wooledge.org/BashFAQ/024)  
+  Explains why variable assignments in function calles in a Bash pipeline doesn't work as expected
