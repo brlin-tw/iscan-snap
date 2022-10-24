@@ -2,7 +2,11 @@
 # Install non-free EPSON scanner plugins
 # Copyright 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
 # SPDX-License-Identifier: MIT
-set -eux
+set \
+    -o \
+    errexit \
+    nounset \
+    xtrace
 shopt -s nullglob
 
 SNAP_USER_COMMON="${SNAP_USER_COMMON:-"${HOME}/snap/iscan/common"}"
