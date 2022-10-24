@@ -231,8 +231,8 @@ parts:
       - xsltproc
     stage-packages:
       - xsltproc
-    #autotools-configure-parameters:
-      #- --prefix=
+    autotools-configure-parameters:
+      - --prefix=/usr
     override-build: |
       patch \
         --strip=0 \
@@ -269,8 +269,10 @@ parts:
       - --enable-jpeg
       - --enable-png
       - --enable-tiff
+      - --prefix=/usr
       - LDFLAGS=-lpng
     build-packages:
+      - gettext
       - libgimp2.0-dev
       - libgtk2.0-dev
       - libjpeg-dev
@@ -354,24 +356,24 @@ parts:
         --directory \
         --mode 0755 \
         --verbose \
-        "${SNAPCRAFT_PART_INSTALL}/usr/local/share/applications/"
+        "${SNAPCRAFT_PART_INSTALL}/usr/share/applications/"
       install \
         --mode 0644 \
         --verbose \
         iscan.desktop \
-        "${SNAPCRAFT_PART_INSTALL}/usr/local/share/applications/"
+        "${SNAPCRAFT_PART_INSTALL}/usr/share/applications/"
 
       # Install EPSON's non-free enduser license
       install \
         --directory \
         --mode 0755 \
         --verbose \
-        "${SNAPCRAFT_PART_INSTALL}/usr/local/share/doc/iscan/"
+        "${SNAPCRAFT_PART_INSTALL}/usr/share/doc/iscan/"
       install \
         --mode 0644 \
         --verbose \
         non-free/COPYING.EPSON.*.txt \
-        "${SNAPCRAFT_PART_INSTALL}/usr/local/share/doc/iscan/"
+        "${SNAPCRAFT_PART_INSTALL}/usr/share/doc/iscan/"
 
     override-prime: |
       set \
@@ -402,7 +404,7 @@ apps:
   iscan:
     # An *relative path* to an executable file root from the `prime` directory to be executed, and its command-line arguments
     # NOTE: The right angle bracket at the beginning of the value of the `command` keyword starts a YAML folded style block scalar, refer the following spec document for more info: http://yaml.org/spec/1.2/spec.html#id2796251
-    command: usr/local/bin/iscan
+    command: usr/bin/iscan
 
     # The commands that are run, in order, before running the one specified by the `command` key
     command-chain:
@@ -411,7 +413,7 @@ apps:
 
     # If the providing part of the app. has a desktop entry, specify its path relative to the `prime` directory.
     # If the packaging target doesn't provide a desktop entry, ignore the `desktop` key and implement a desktop entry in `/snap/gui`
-    desktop: usr/local/share/applications/iscan.desktop
+    desktop: usr/share/applications/iscan.desktop
 
     environment:
       GTK_PATH: $SNAP/lib/gtk-2.0
@@ -419,13 +421,13 @@ apps:
       XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
 
       SANE_CONFIG_DIR: $SNAP/etc/sane.d
-      LD_LIBRARY_PATH: $SNAP/usr/local/lib/sane:$SNAP/usr/local/lib
+      LD_LIBRARY_PATH: $SNAP/usr/lib/sane:$SNAP/usr/lib
 
   make-policy-file:
-    command: usr/local/lib/iscan-data/make-policy-file
+    command: usr/lib/iscan-data/make-policy-file
 
   registry:
-    command: usr/local/sbin/iscan-registry
+    command: usr/sbin/iscan-registry
 
   install-nonfree-plugins:
     command: bin/install-non-free-plugins.sh
@@ -439,11 +441,6 @@ apps:
       GTK_PATH: $SNAP/lib/gtk-2.0
       GTK_DATA_PREFIX: $SNAP
       XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
-
-# Filesystem workarounds for applications that hardcode their paths
-layout:
-  /usr/local/share/iscan-data:
-    symlink: $SNAP/usr/local/share/iscan-data
 
 # Refer the following documentation for asserting interface plugs and slots in a security confined snap:
 # Interface management - doc - snapcraft.io
