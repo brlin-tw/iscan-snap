@@ -351,7 +351,10 @@ install_plugin(){
 
 # Enable Logging #
 # https://stackoverflow.com/questions/18460186/writing-outputs-to-log-file-and-console
-exec 1> >(tee /tmp/install-non-free-plugins.log) 2>&1
+exec 1> >(
+    tee \
+        /tmp/install-non-free-plugins.log
+) 2>&1
 
 script_filename="${BASH_SOURCE##*/}"
 script_name="${script_filename%%.*}"
