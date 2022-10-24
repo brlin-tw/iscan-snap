@@ -282,16 +282,27 @@ for plugin in ${plugins}; do
     package_filename="${plugin_package_download_url##*/}"
     downloaded_plugin_package="${package_dir}/${package_filename}"
 
-    download_plugin_package \
+    if ! download_plugin_package \
         "${plugin_package_download_url}" \
-        "${package_dir}"
+        "${package_dir}"; then
+        printf \
+            'Error: Unable to download the plugin package for the "%s" plugin.\n' \
+            "${plugin}" \
+            1>&2
+        continue
+    fi
 
     package_type="$(detect_plugin_package_type "${package_filename}")"
     case "${package_type}" in
         deb_bundle)
-            unpack_deb_bundle_package \
+            if ! unpack_deb_bundle_package \
                 "${downloaded_plugin_package}" \
-                "${bundle_unpack_dir}"
+                "${bundle_unpack_dir}"; then
+                printf 'Error: Unable to unpack the Debian bundle package for the "%s" plugin.\n' \
+                    "${plugin}" \
+                    1>&2
+                continue
+            fi
             flag_plugin_package_found=false
             for possible_plugin_package in \
                 "${bundle_unpack_dir}/iscan-"*"-bundle-"*".deb/plugins/iscan-plugin-"*".deb" \
@@ -300,16 +311,20 @@ for plugin in ${plugins}; do
                 plugin_package="${possible_plugin_package}"
             done
             if test "${flag_plugin_package_found}" == false; then
-                printf 'Error: Unable to locate the plugin package in the bundle package.\n' 1>&2
-                exit 1
+                printf 'Error: Unable to locate the plugin package in the bundle package for the "%s" plugin.\n' \
+                    "${plugin}" \
+                    1>&2
+                continue
             fi
         ;;
         rpm)
             plugin_package="${downloaded_plugin_package}"
         ;;
         unknown)
-            printf 'Error: Plugin package type cannot be determined.\n' 1>&2
-            exit 1
+            printf 'Error: Plugin package type cannot be determined for the "%s" plugin.\n' \
+                "${plugin}" \
+                1>&2
+            continue
         ;;
         *)
             printf 'FATAL: Design error, report bug.\n' 1>&2
@@ -317,19 +332,34 @@ for plugin in ${plugins}; do
         ;;
     esac
 
-    unpack_plugin_package \
+    if ! unpack_plugin_package \
         "${plugin_package}" \
         "${package_type}" \
-        "${extract_dir}"
+        "${extract_dir}"; then
+        printf 'Error: Unable to unpack the plugin package for the "%s" plugin.\n' \
+            "${plugin}" \
+            1>&2
+        continue
+    fi
 
-    install_plugin_files \
-        "${extract_dir}"
+    if ! install_plugin_files \
+        "${extract_dir}"; then
+        printf 'Error: Unable to install the plugin files for the "%s" plugin.\n' \
+            "${plugin}" \
+            1>&2
+        continue
+    fi
 
-    register_iscan_plugin \
+    if ! register_iscan_plugin \
         "${plugin}" \
         "${plugin_package}" \
         "${package_type}" \
-        "${temp_dir}"
+        "${temp_dir}"; then
+        printf 'Error: Unable to register the "%s" plugin.\n' \
+            "${plugin}" \
+            1>&2
+        continue
+    fi
 
     rm -rf \
         "${temp_dir}"
