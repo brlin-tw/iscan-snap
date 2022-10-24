@@ -40,7 +40,8 @@ trap_exit(){
 
     rm \
         -f \
-        /tmp/install-non-free-plugins.log
+        /tmp/install-non-free-plugins.log \
+        /tmp/plugin-installation-has-errors.marker
 }
 
 trap_err(){
@@ -389,11 +390,61 @@ if test -z "${plugins}"; then
     exit 0
 fi
 
+plugin_installed=0
+plugin_count="$(
+    IFS=' '
+    # shellcheck disable=SC2086
+    set -f -- ${plugins}
+    echo "${#}"
+)"
 for plugin in ${plugins}; do
+    echo "scale = 0; ${plugin_installed} * 100 / ${plugin_count}" | bc --mathlib
 
-done
-zenity \
-    --title 'Info' \
-    --width 640 \
-    --info \
-    --text 'Install completed without errors.'
+    echo "# Installing ${plugin} plugin..."
+    if ! install_plugin \
+        "${plugin}"; then
+        printf \
+            'Warning: Unable to install the "%s" plugin.\n' \
+            "${plugin}" \
+            1>&2
+        touch /tmp/plugin-installation-has-errors.marker
+    fi
+
+    ((plugin_installed += 1))
+done \
+    | zenity \
+        --width=640 \
+        --progress \
+        --title="Installing non-free plugins" \
+        --text="Initializing..." \
+        --percentage=0 \
+        --auto-close \
+    || zenity \
+        --title 'Info' \
+        --width 640 \
+        --info \
+        --text 'Installation cancelled.'
+
+if test -e /tmp/plugin-installation-has-errors.marker; then
+    zenity \
+        --title 'Warning' \
+        --width 640 \
+        --warning \
+        --text "Some plugins failed to install, if it's a bug report it to &lt;https://github.com/brlin-tw/iscan-snap/issues&gt; and attach the logs showed in the next dialog."
+    zenity \
+        --title='Debug logs' \
+        --width=640 \
+        --height=360 \
+        --text-info \
+        --font=monospace \
+        --filename="/tmp/install-non-free-plugins.log" \
+        --ok-label='Continue'
+    trap - ERR
+    exit 1
+else
+    zenity \
+        --title 'Info' \
+        --width 640 \
+        --info \
+        --text 'Install completed without errors.'
+fi
