@@ -70,7 +70,7 @@ detect_plugin_package_type(){
     local package_filename="${1}"; shift
 
     case "${package_filename}" in
-        iscan-*-bundle-*.*.deb.tar.gz)
+        iscan-*-bundle-*.*.deb.tar*)
             printf deb_bundle
         ;;
         *.rpm)
