@@ -5,8 +5,7 @@
 set \
     -o \
     errexit \
-    nounset \
-    xtrace
+    nounset
 shopt -s nullglob
 
 SNAP_USER_COMMON="${SNAP_USER_COMMON:-"${HOME}/snap/iscan/common"}"
