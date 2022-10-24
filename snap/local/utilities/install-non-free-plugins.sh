@@ -37,6 +37,10 @@ trap_exit(){
             -rf \
             "${temp_dir}"
     fi
+
+    rm \
+        -f \
+        /tmp/install-non-free-plugins.log
 }
 
 trap_err(){
@@ -44,7 +48,14 @@ trap_err(){
         --title 'Error' \
         --width 640 \
         --error \
-        --text 'Install terminated prematurely with errors, please report.'
+        --text 'Install terminated prematurely with errors, if it appears to be a software bug please report it at &lt;https://github.com/brlin-tw/iscan-snap/issues&gt; with the log attached in the next dialog.'
+    zenity \
+        --title='Debug logs' \
+        --width=640 \
+        --height=360 \
+        --text-info \
+        --filename="/tmp/install-non-free-plugins.log" \
+        --ok-label='Continue'
 }
 trap trap_err ERR
 
@@ -210,6 +221,10 @@ register_iscan_plugin(){
         ;;
     esac
 }
+
+# Enable Logging #
+# https://stackoverflow.com/questions/18460186/writing-outputs-to-log-file-and-console
+exec 1> >(tee /tmp/install-non-free-plugins.log) 2>&1
 
 script_filename="${BASH_SOURCE##*/}"
 script_name="${script_filename%%.*}"
