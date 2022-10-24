@@ -234,6 +234,120 @@ register_iscan_plugin(){
     esac
 }
 
+install_plugin(){
+    local plugin="${1}"; shift
+
+    temp_dir="$(
+        mktemp \
+            --directory \
+            --tmpdir \
+            "${script_name}.${plugin}.XXX"
+    )"
+    package_dir="${temp_dir}/package"
+    bundle_unpack_dir="${temp_dir}/bundle-unpack"
+    extract_dir="${temp_dir}/extract"
+    mkdir \
+        "${package_dir}" \
+        "${bundle_unpack_dir}" \
+        "${extract_dir}"
+
+    plugin_package_download_url="${PLUGIN_PACKAGE_DOWNLOAD_URLS["${plugin}"]}"
+    package_filename="${plugin_package_download_url##*/}"
+    downloaded_plugin_package="${package_dir}/${package_filename}"
+
+    if ! download_plugin_package \
+        "${plugin_package_download_url}" \
+        "${package_dir}"; then
+        printf \
+            '%s: Error: Unable to download the plugin package for the "%s" plugin.\n' \
+            "${FUNCNAME[0]}" \
+            "${plugin}" \
+            1>&2
+        return 1
+    fi
+
+    package_type="$(detect_plugin_package_type "${package_filename}")"
+    case "${package_type}" in
+        deb_bundle)
+            if ! unpack_deb_bundle_package \
+                "${downloaded_plugin_package}" \
+                "${bundle_unpack_dir}"; then
+                printf '%s: Error: Unable to unpack the Debian bundle package for the "%s" plugin.\n' \
+                    "${FUNCNAME[0]}" \
+                    "${plugin}" \
+                    1>&2
+                return 2
+            fi
+            flag_plugin_package_found=false
+            for possible_plugin_package in \
+                "${bundle_unpack_dir}/iscan-"*"-bundle-"*".deb/plugins/iscan-plugin-"*".deb" \
+                "${bundle_unpack_dir}/iscan-"*"-bundle-"*".deb/plugins/esci-interpreter-"*".deb"; do
+                flag_plugin_package_found=true
+                plugin_package="${possible_plugin_package}"
+            done
+            if test "${flag_plugin_package_found}" == false; then
+                printf '%s: Error: Unable to locate the plugin package in the bundle package for the "%s" plugin.\n' \
+                    "${FUNCNAME[0]}" \
+                    "${plugin}" \
+                    1>&2
+                return 3
+            fi
+        ;;
+        rpm)
+            plugin_package="${downloaded_plugin_package}"
+        ;;
+        unknown)
+            printf '%s: Error: Plugin package type cannot be determined for the "%s" plugin.\n' \
+                "${FUNCNAME[0]}" \
+                "${plugin}" \
+                1>&2
+            return 4
+        ;;
+        *)
+            printf \
+                '%s: FATAL: Design error, report bug.\n' \
+                "${FUNCNAME[0]}" \
+                1>&2
+            exit 99
+        ;;
+    esac
+
+    if ! unpack_plugin_package \
+        "${plugin_package}" \
+        "${package_type}" \
+        "${extract_dir}"; then
+        printf '%s: Error: Unable to unpack the plugin package for the "%s" plugin.\n' \
+            "${FUNCNAME[0]}" \
+            "${plugin}" \
+            1>&2
+        return 5
+    fi
+
+    if ! install_plugin_files \
+        "${extract_dir}"; then
+        printf '%s: Error: Unable to install the plugin files for the "%s" plugin.\n' \
+            "${FUNCNAME[0]}" \
+            "${plugin}" \
+            1>&2
+        return 6
+    fi
+
+    if ! register_iscan_plugin \
+        "${plugin}" \
+        "${plugin_package}" \
+        "${package_type}" \
+        "${temp_dir}"; then
+        printf '%s: Error: Unable to register the "%s" plugin.\n' \
+            "${FUNCNAME[0]}" \
+            "${plugin}" \
+            1>&2
+        return 7
+    fi
+
+    rm -rf \
+        "${temp_dir}"
+}
+
 # Enable Logging #
 # https://stackoverflow.com/questions/18460186/writing-outputs-to-log-file-and-console
 exec 1> >(tee /tmp/install-non-free-plugins.log) 2>&1
@@ -276,105 +390,7 @@ if test -z "${plugins}"; then
 fi
 
 for plugin in ${plugins}; do
-    temp_dir="$(
-        mktemp \
-            --directory \
-            --tmpdir \
-            "${script_name}.${plugin}.XXX"
-    )"
-    package_dir="${temp_dir}/package"
-    bundle_unpack_dir="${temp_dir}/bundle-unpack"
-    extract_dir="${temp_dir}/extract"
-    mkdir \
-        "${package_dir}" \
-        "${bundle_unpack_dir}" \
-        "${extract_dir}"
 
-    plugin_package_download_url="${PLUGIN_PACKAGE_DOWNLOAD_URLS["${plugin}"]}"
-    package_filename="${plugin_package_download_url##*/}"
-    downloaded_plugin_package="${package_dir}/${package_filename}"
-
-    if ! download_plugin_package \
-        "${plugin_package_download_url}" \
-        "${package_dir}"; then
-        printf \
-            'Error: Unable to download the plugin package for the "%s" plugin.\n' \
-            "${plugin}" \
-            1>&2
-        continue
-    fi
-
-    package_type="$(detect_plugin_package_type "${package_filename}")"
-    case "${package_type}" in
-        deb_bundle)
-            if ! unpack_deb_bundle_package \
-                "${downloaded_plugin_package}" \
-                "${bundle_unpack_dir}"; then
-                printf 'Error: Unable to unpack the Debian bundle package for the "%s" plugin.\n' \
-                    "${plugin}" \
-                    1>&2
-                continue
-            fi
-            flag_plugin_package_found=false
-            for possible_plugin_package in \
-                "${bundle_unpack_dir}/iscan-"*"-bundle-"*".deb/plugins/iscan-plugin-"*".deb" \
-                "${bundle_unpack_dir}/iscan-"*"-bundle-"*".deb/plugins/esci-interpreter-"*".deb"; do
-                flag_plugin_package_found=true
-                plugin_package="${possible_plugin_package}"
-            done
-            if test "${flag_plugin_package_found}" == false; then
-                printf 'Error: Unable to locate the plugin package in the bundle package for the "%s" plugin.\n' \
-                    "${plugin}" \
-                    1>&2
-                continue
-            fi
-        ;;
-        rpm)
-            plugin_package="${downloaded_plugin_package}"
-        ;;
-        unknown)
-            printf 'Error: Plugin package type cannot be determined for the "%s" plugin.\n' \
-                "${plugin}" \
-                1>&2
-            continue
-        ;;
-        *)
-            printf 'FATAL: Design error, report bug.\n' 1>&2
-            exit 99
-        ;;
-    esac
-
-    if ! unpack_plugin_package \
-        "${plugin_package}" \
-        "${package_type}" \
-        "${extract_dir}"; then
-        printf 'Error: Unable to unpack the plugin package for the "%s" plugin.\n' \
-            "${plugin}" \
-            1>&2
-        continue
-    fi
-
-    if ! install_plugin_files \
-        "${extract_dir}"; then
-        printf 'Error: Unable to install the plugin files for the "%s" plugin.\n' \
-            "${plugin}" \
-            1>&2
-        continue
-    fi
-
-    if ! register_iscan_plugin \
-        "${plugin}" \
-        "${plugin_package}" \
-        "${package_type}" \
-        "${temp_dir}"; then
-        printf 'Error: Unable to register the "%s" plugin.\n' \
-            "${plugin}" \
-            1>&2
-        continue
-    fi
-
-    rm -rf \
-        "${temp_dir}"
 done
 zenity \
     --title 'Info' \
