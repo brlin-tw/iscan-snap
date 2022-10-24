@@ -15,7 +15,6 @@ set \
 shopt \
     -s nullglob
 
-PATH="${SNAP}/usr/local/bin:${SNAP}/usr/local/sbin:${PATH}"
 export ISCAN_FIRMWARE_DIR="${SNAP_USER_COMMON}/firmware"
 
 # Plugin support
@@ -45,7 +44,7 @@ if ! test -e "${epson_end_user_software_license_read_marker_file}"; then
             --width=640 \
             --height=360 \
             --text-info \
-            --filename="${SNAP}/usr/local/share/doc/iscan/COPYING.EPSON.en.txt" \
+            --filename="${SNAP}/usr/share/doc/iscan/COPYING.EPSON.en.txt" \
             --checkbox='I read and accept the terms.' \
             --ok-label='Continue'; then
         exit 1
@@ -61,7 +60,7 @@ if ! test -e "${udev_notice_read_marker_file}"; then
         --width=640 \
         --info \
         --ok-label='Continue' \
-        --text="Due to snapd's limitations the snap is unable to install the required udev rules to enable the snap to access the scanners.\\n\\nPlease run the following commands in the terminal to fix it manually:\\n\\n<tt>    iscan.make-policy-file --mode udev --desc-file /snap/iscan/current/usr/local/share/iscan-data/epkowa.desc --force -o 60-iscan.rules\\n    sudo install --owner=root --group=root --mode 0644 60-iscan.rules /etc/udev/rules.d/\\n    sudo udevadm control --reload</tt>\\n\\nThis dialog will only display once, to see it again remove the ${udev_notice_read_marker_file} marker file and relaunch the application."
+        --text="Due to snapd's limitations the snap is unable to install the required udev rules to enable the snap to access the scanners.\\n\\nPlease run the following commands in the terminal to fix it manually:\\n\\n<tt>    iscan.make-policy-file --mode udev --desc-file /snap/iscan/current/usr/share/iscan-data/epkowa.desc --force -o 60-iscan.rules\\n    sudo install --owner=root --group=root --mode 0644 60-iscan.rules /etc/udev/rules.d/\\n    sudo udevadm control --reload</tt>\\n\\nThis dialog will only display once, to see it again remove the ${udev_notice_read_marker_file} marker file and relaunch the application."
     touch "${udev_notice_read_marker_file}"
 fi
 
