@@ -375,6 +375,10 @@ parts:
         non-free/COPYING.EPSON.*.txt \
         "${SNAPCRAFT_PART_INSTALL}/usr/share/doc/iscan/"
 
+      strip \
+        "${SNAPCRAFT_PART_INSTALL}/usr/bin/iscan" \
+        "${SNAPCRAFT_PART_INSTALL}/usr/lib/sane/libsane-epkowa.so."*.*.*
+
     override-prime: |
       set \
         -o nounset
