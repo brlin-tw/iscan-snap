@@ -39,7 +39,6 @@ trap_exit(){
     fi
 }
 
-trap trap_err ERR
 trap_err(){
     zenity \
         --title 'Error' \
@@ -47,6 +46,7 @@ trap_err(){
         --error \
         --text 'Install terminated prematurely with errors, please report.'
 }
+trap trap_err ERR
 
 # Download plugin package from _plugin_package_download_url_, and place
 # it in _download_dir_
