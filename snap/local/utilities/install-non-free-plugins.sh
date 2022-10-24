@@ -72,7 +72,8 @@ download_plugin_package(){
             --location \
             --remote-header-name \
             --remote-name \
-            --verbose \
+            --show-error \
+            --silent \
             "${plugin_package_download_url}"; then
             printf \
                 '%s: Error: Unable to download the plugin package from the "%s" URL.\n' \
