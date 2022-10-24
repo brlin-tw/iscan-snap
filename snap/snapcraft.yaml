@@ -161,6 +161,7 @@ parts:
   utilities-deps:
     plugin: nil
     stage-packages:
+      - bc
       - cpio
       - curl
       - dpkg
