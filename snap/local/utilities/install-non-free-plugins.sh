@@ -65,15 +65,26 @@ download_plugin_package(){
     local plugin_package_download_url="${1}"; shift
     local download_dir="${1}"; shift
 
+    local flag_download_failed=false
     pushd "${download_dir}" >/dev/null
-        curl \
+        if ! curl \
+            --fail \
             --location \
             --remote-header-name \
             --remote-name \
             --verbose \
-            --fail \
-            "${plugin_package_download_url}"
+            "${plugin_package_download_url}"; then
+            printf \
+                '%s: Error: Unable to download the plugin package from the "%s" URL.\n' \
+                "${FUNCNAME[0]}" \
+                "${plugin_package_download_url}" \
+                1>&2
+            flag_download_failed=true
+        fi
     popd >/dev/null
+    if test "${flag_download_failed}" == true; then
+        return 1
+    fi
 }
 
 # Detect plugin package type(deb_bundle/rpm) from _package_filename_
