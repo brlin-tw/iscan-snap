@@ -76,5 +76,23 @@ if ! test -e "${non_free_plugins_notice_read_marker_file}"; then
     touch "${non_free_plugins_notice_read_marker_file}"
 fi
 
+if ! snapctl is-connected hardware-observe; then
+    zenity \
+        --title='Snapd confinement interface connection required: hardware-observe' \
+        --width=640 \
+        --info \
+        --ok-label='Continue' \
+        --text="This application requires the snap to be connected to the snapd's \"hardware-observe\" interface slot to allow discovery of the USB scanner devices\\n\\nPlease run the following commands in the terminal to connect them:\\n\\n<tt>    sudo snap connect iscan:hardware-observe</tt>"
+fi
+
+if ! snapctl is-connected raw-usb; then
+    zenity \
+        --title='Snapd confinement interface connection required: raw-usb' \
+        --width=640 \
+        --info \
+        --ok-label='Continue' \
+        --text="This application requires the snap to be connected to the snapd's \"raw-usb\" interface slot to allow direct read/write access to the USB scanner devices\\n\\nPlease run the following commands in the terminal to connect them:\\n\\n<tt>    sudo snap connect iscan:raw-usb</tt>"
+fi
+
 # Finally run the next part of the command chain
 exec "${@}"
