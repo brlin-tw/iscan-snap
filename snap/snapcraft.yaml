@@ -621,7 +621,7 @@ apps:
     command-chain:
       - bin/locales-launch
       - bin/desktop-launch
-      - bin/iscan-launch
+      - bin/install-non-free-plugins-launch
 
     environment:
       GTK_PATH: $SNAP/lib/gtk-2.0

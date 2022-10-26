@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Ensure user agree EPSON's EULA before installing non-free plugins
+#
+# Copyright 2019, 2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+# SPDX-License-Identifier: MIT
+
+set \
+    -o errexit \
+    -o errtrace \
+    -o nounset \
+    -o pipefail
+
+epson_end_user_software_license_read_marker_file="${SNAP_USER_COMMON}/user-agreed-epson-proprietary-license.marker"
+if ! test -e "${epson_end_user_software_license_read_marker_file}"; then
+    if ! zenity \
+            --title='EPSON END USER SOFTWARE LICENSE' \
+            --width=640 \
+            --height=360 \
+            --text-info \
+            --filename="${SNAP}/usr/share/doc/iscan/COPYING.EPSON.en.txt" \
+            --checkbox='I read and accept the terms.' \
+            --ok-label='Continue'; then
+        exit 1
+    else
+        touch "${epson_end_user_software_license_read_marker_file}"
+    fi
+fi
+
+# Finally run the next part of the command chain
+exec "${@}"
