@@ -154,6 +154,14 @@ unpack_plugin_package(){
 install_plugin_files(){
     local extract_dir="${1}"; shift
 
+    install \
+        --verbose \
+        --directory \
+        --mode 0755 \
+        "${SNAP_USER_COMMON}/firmware" \
+        "${SNAP_USER_COMMON}/plugins" \
+        "${SNAP_USER_COMMON}/device"
+
     for plugin_file in \
         "${extract_dir}/usr/lib/iscan/"*.so* \
         "${extract_dir}/usr/lib/esci/"*.so*; do
@@ -185,6 +193,12 @@ register_iscan_plugin(){
     local plugin_package="${1}"; shift
     local package_type="${1}"; shift
     local temp_dir="${1}"; shift
+
+    install \
+        --verbose \
+        --directory \
+        --mode 0755 \
+        "${SNAP_USER_COMMON}/state"
 
     # Remove duplicate entries
     if test -e "${SNAP_USER_COMMON}/state/interpreter"; then
@@ -358,6 +372,7 @@ exec 1> >(
 
 script_filename="${BASH_SOURCE##*/}"
 script_name="${script_filename%%.*}"
+
 zenity_list_data=(
     FALSE cx4400 'Stylus CX4300/CX4400/CX5500/CX5600/DX4400' 'N/A'
     FALSE ds-30 'WorkForce DS-30' DS-30
