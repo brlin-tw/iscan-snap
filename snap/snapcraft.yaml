@@ -167,6 +167,26 @@ parts:
       - dpkg
       - rpm2cpio
 
+    filesets:
+      executables:
+        - bin/cpio
+        - usr/bin/bc
+        - usr/bin/curl
+        - usr/bin/dpkg
+        - usr/bin/rpm2cpio
+
+      dynamic-libraries:
+        - lib/**/*.so*
+        - usr/lib/**/*.so*
+
+      copyright:
+        - usr/share/doc/**/copyright
+
+    prime:
+      - $executables
+      - $dynamic-libraries
+      - $copyright
+
   # This part installs the `desktop-launch` script which initialises desktop
   # features such as fonts, themes and the XDG environment. It also installs
   # the GTK2 runtime libraries.
@@ -203,6 +223,92 @@ parts:
       - ttf-ubuntu-font-family
       - unity-gtk2-module
 
+    filesets:
+      copyright:
+        - usr/share/doc/**/copyright
+
+      executables:
+        - bin/desktop-launch
+        - flavor-select
+        - usr/bin/gtk-update-icon-cache
+        - usr/bin/update-mime-database
+        - usr/sbin/update-icon-caches
+
+      fontconfig-configs:
+        - etc/fonts
+
+      libraries:
+        - lib/**/*.so*
+        - usr/lib/**/*.so*
+        - -usr/lib/*/libgphoto2
+
+      library-executables:
+        - usr/lib/*/glib-2.0/glib-compile-schemas
+        - usr/lib/*/glib-2.0/gio-querymodules
+        - usr/lib/*/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
+        - usr/lib/*/libgtk2.0-0/gtk-query-immodules-2.0
+
+      mime-resources:
+        - usr/share/mime
+
+      x11-resources:
+        - usr/share/X11
+
+      exclude-fonts:
+        - -usr/share/fonts
+
+      exclude-icon-themes:
+        - -usr/share/icons
+
+      exclude-locale:
+        - -usr/lib/locale
+
+      exclude-ui-themes:
+        - -usr/share/themes
+
+    prime:
+      - $copyright
+      - $fontconfig-configs
+      - $executables
+      - $libraries
+      - $library-executables
+      - $mime-resources
+      - $x11-resources
+
+      - $exclude-fonts
+      - $exclude-icon-themes
+      - $exclude-locale
+      - $exclude-ui-themes
+
+  # Stage snap for fixing the Glibc locales
+  # https://forum.snapcraft.io/t/the-locales-launch-stage-snap/10296
+  locales-launch:
+    source: https://github.com/brlin-tw/locales-launch.git
+    source-tag: v1.0.0
+    plugin: dump
+    stage-packages:
+      # For localedef(1)
+      - libc-bin
+
+      # For locale data used by localedef(1)
+      - locales
+
+      # All pre-generated locale data
+      # DISABLED: Lots of duplicate data will be included in snap when this is staged, unless the target machine has no resource to generate them in runtime otherwise not using it
+      #
+      #   Lack of compiled locales breaks gettext based localisation - snapcraft - snapcraft.io
+      #   https://forum.snapcraft.io/t/lack-of-compiled-locales-breaks-gettext-based-localisation/3758
+      #
+      #- locales-all
+
+    stage:
+      - bin/locales-launch
+      - etc/locale.alias
+      - usr/bin/localedef
+      - usr/share/doc/locales
+      - usr/share/i18n
+      - usr/share/locale
+
   # Integrate custom dialogs in your snap - doc - snapcraft.io
   # https://forum.snapcraft.io/t/integrate-custom-dialogs-in-your-snap/10825
   zenity-integration:
@@ -214,12 +320,44 @@ parts:
       - libnotify4
       - libwebkit2gtk-4.0-37
 
+    filesets:
+      copyright:
+        - usr/share/doc/**/copyright
+      executables:
+        - bin/zenity
+      locales:
+        - share/locale/**/zenity.mo
+      libraries:
+        - lib/**/*.so*
+        - usr/lib/**/*.so*
+        - -usr/lib/*/dri
+        - -usr/lib/*/libLLVM-*.so*
+      resources:
+        - share/zenity/**
+
+    prime:
+      - $copyright
+      - $executables
+      - $libraries
+      - $locales
+      - $resources
+
   # ltrace for runtime-patching debugging
   # NOTE: For some reason it only be usable when the snap is install with --dev-mode
-  ltrace:
-    plugin: nil
-    stage-packages:
-      - ltrace
+  #ltrace:
+    #plugin: nil
+    #stage-packages:
+      #- ltrace
+
+    #filesets:
+      #executables:
+        #- usr/bin/ltrace
+      #copyright:
+        #- usr/share/doc/**/copyright
+
+    #prime:
+      #- $executables
+      #- $copyright
 
   # iscan-data
   data:
@@ -248,6 +386,17 @@ parts:
         <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-stanza-generation-in-make-policy-file-script.patch"
 
       snapcraftctl build
+
+    filesets:
+      application-data:
+        - usr/share/iscan-data/**
+        - usr/lib/iscan-data/**
+      copyright:
+        - usr/share/doc/**/copyright
+
+    prime:
+      - $application-data
+      - $copyright
 
   main:
     after:
@@ -290,7 +439,6 @@ parts:
       - libfribidi0
       - libgdk-pixbuf2.0-0
       - libgraphite2-3
-      - libgtk2.0-0
       - libharfbuzz0b
       - libjpeg8
       - libpango-1.0-0
@@ -379,6 +527,38 @@ parts:
         "${SNAPCRAFT_PART_INSTALL}/usr/bin/iscan" \
         "${SNAPCRAFT_PART_INSTALL}/usr/lib/sane/libsane-epkowa.so."*.*.*
 
+    filesets:
+      application-executables:
+        - usr/bin/iscan
+        - usr/sbin/iscan-registry
+      application-desktop-entries:
+        - usr/share/applications/iscan.desktop
+      application-documentation:
+        - usr/share/doc/iscan
+      application-libraries:
+        - usr/lib/libesmod.so*
+      application-locales:
+        - usr/share/locale/**/iscan.mo
+      dynamic-libraries:
+        - lib/**/*.so*
+        - usr/lib/**/*.so*
+        - -usr/lib/*/perl
+        - -usr/lib/*/sane
+        - -usr/lib/*/libmysqlclient.so.21.2.30
+      copyright:
+        - usr/share/doc/**/copyright
+      sane-configs:
+        - etc/sane.d/**
+
+    prime:
+      - $application-executables
+      - $application-desktop-entries
+      - $application-documentation
+      - $application-libraries
+      - $application-locales
+      - $dynamic-libraries
+      - $copyright
+      - $sane-configs
     override-prime: |
       set \
         -o nounset
@@ -412,6 +592,7 @@ apps:
 
     # The commands that are run, in order, before running the one specified by the `command` key
     command-chain:
+      - bin/locales-launch
       - bin/desktop-launch
       - bin/iscan-launch
 
