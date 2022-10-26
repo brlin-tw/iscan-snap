@@ -686,7 +686,3 @@ plugs:
 
   # Allow raw USB interface access
   raw-usb:
-
-  # Allow ltrace for debugging
-  system-trace:
-#slots:
