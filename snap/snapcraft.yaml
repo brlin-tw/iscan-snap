@@ -619,6 +619,7 @@ apps:
 
     # The commands that are run, in order, before running the one specified by the `command` key
     command-chain:
+      - bin/locales-launch
       - bin/desktop-launch
       - bin/iscan-launch
 
