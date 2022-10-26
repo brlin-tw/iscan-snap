@@ -93,5 +93,17 @@ if ! snapctl is-connected raw-usb; then
         --text="This application requires the snap to be connected to the snapd's \"raw-usb\" interface slot to allow direct read/write access to the USB scanner devices\\n\\nPlease run the following commands in the terminal to connect them:\\n\\n<tt>    sudo snap connect iscan:raw-usb</tt>"
 fi
 
+removable_media_interface_connection_notice_read_marker_file="${SNAP_USER_COMMON}/skip-removable-media-interface-connection-notice.marker"
+if ! snapctl is-connected removable-media \
+    && ! test -e "${removable_media_interface_connection_notice_read_marker_file}"; then
+    zenity \
+        --title='Snapd confinement interface connection recommended: removable-media' \
+        --width=640 \
+        --info \
+        --ok-label='Continue' \
+        --text="This application <i>recommends</i> the snap to be connected to the snapd's \"removable-media\" interface slot to allow saving scanned documents to your external storages under /media or /mnt.\\n\\nIf such access is preferred, please run the following commands in the terminal to connect them:\\n\\n<tt>    sudo snap connect iscan:removable-media</tt>\\n\\nThis dialog will only display once, to see it again remove the ${removable_media_interface_connection_notice_read_marker_file} marker file and relaunch the application."
+    touch "${removable_media_interface_connection_notice_read_marker_file}"
+fi
+
 # Finally run the next part of the command chain
 exec "${@}"
