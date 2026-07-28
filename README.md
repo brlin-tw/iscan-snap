@@ -77,11 +77,11 @@ You may generate the unique hash by using the following command in terminal:
 ## Licensing
 
 The licensing condition is different between the source recipe and the
-built snap, refer the folling sections for details.
+built snap, refer the following sections for details.
 
 ### Source recipe
 
-This project comply with the REUSE specification, please refer the [.reuse/dep5](.reuse/dep5) file and each applicable file's header for licensing requirement of each resource.
+This project complies with the REUSE specification, please refer the [.reuse/dep5](.reuse/dep5) file and each applicable file's header for licensing requirement of each resource.
 
 ### Built snap
 
