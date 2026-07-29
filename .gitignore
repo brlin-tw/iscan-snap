@@ -96,3 +96,7 @@ __pycache__
 
 /*.snap
 /*_source.tar.bz2
+
+# Do track agent skills
+!/.agents/
+!/.claude/
