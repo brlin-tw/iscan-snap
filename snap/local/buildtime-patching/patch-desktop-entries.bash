@@ -94,8 +94,8 @@ init(){
         exit 1
     fi
 
-    if ! test -v SNAPCRAFT_PRIME \
-        || test "${PWD}" != "${SNAPCRAFT_PRIME}"; then
+    if ! test -v CRAFT_PRIME \
+        || test "${PWD}" != "${CRAFT_PRIME}"; then
         printf -- \
             "%s: Error: This script should be run by \`snapcraft\` in the \`override-prime\` scriptlet.\\n" \
             "${RUNTIME_EXECUTABLE_NAME}"

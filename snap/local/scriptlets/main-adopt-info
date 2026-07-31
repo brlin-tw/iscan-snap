@@ -25,7 +25,7 @@ init(){
             --debug)
                 set -o xtrace
             ;;
-            # Don't run snapcraftctl for testing purpose
+            # Don't run craftctl for testing purpose
             --dry-run)
                 flag_dry_run=true
             ;;
@@ -48,26 +48,32 @@ init(){
             --only-matching \
             --perl-regexp \
             '(?<=iscan_)\d+\.\d+\.\d+' \
-            "${SNAPCRAFT_PROJECT_DIR}/snap/snapcraft.yaml"
+            "${CRAFT_PROJECT_DIR}/snap/snapcraft.yaml"
     )"
     iscan_data_version="$(
         grep \
             --only-matching \
             --perl-regexp \
             '(?<=iscan-data_)\d+\.\d+\.\d+' \
-            "${SNAPCRAFT_PROJECT_DIR}/snap/snapcraft.yaml"
+            "${CRAFT_PROJECT_DIR}/snap/snapcraft.yaml"
     )"
     upstream_version="${iscan_version}+data${iscan_data_version}"
 
-    packaging_revision="$(
+    if ! packaging_revision="$(
         git \
-            -C "${SNAPCRAFT_PROJECT_DIR}" \
+            -C "${CRAFT_PROJECT_DIR}" \
             describe \
             --abbrev=4 \
             --always \
             --match nothing \
-            --dirty=-d
-    )"
+            --dirty=-d \
+            2>/dev/null
+    )"; then
+        printf \
+            'main-adopt-info: Warning: Git metadata is unavailable; using "unknown" as the packaging revision.\n' \
+            1>&2
+        packaging_revision=unknown
+    fi
 
     snap_version_string="${upstream_version}+s${packaging_revision}"
 
@@ -75,8 +81,7 @@ init(){
         'main-adopt-info: Setting snap version to "%s".\n' \
         "${snap_version_string}"
     if [ "${flag_dry_run}" = false ]; then
-        snapcraftctl set-version \
-            "${snap_version_string}"
+        craftctl set version="${snap_version_string}"
     fi
 
     exit 0

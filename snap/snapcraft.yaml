@@ -96,7 +96,7 @@ assumes:
 # Base runtime
 # The common runtime for the snap to run on, or `bare` for static linked applications
 # https://docs.snapcraft.io/snapcraft-top-level-metadata/8334#heading--base
-base: core20
+base: core24
 
 # Security confinement
 # Use `devmode` to getting started
@@ -110,12 +110,9 @@ confinement: strict
 # snaps can be promoted to `candidate` and `stable` channels
 grade: stable
 
-# Currently only supports i386/amd64
-architectures:
-  - build-on: amd64
-    run-on: amd64
-  - build-on: i386
-    run-on: i386
+# The bundled proprietary esmod library only supports amd64
+platforms:
+  amd64:
 
 # Run `snapcraft help sources` for supported keywords on pulling a part's source ingredients
 # Run `snapcraft plugins` for supported build helper plugins
@@ -167,25 +164,16 @@ parts:
       - dpkg
       - rpm2cpio
 
-    filesets:
-      executables:
-        - bin/cpio
-        - usr/bin/bc
-        - usr/bin/curl
-        - usr/bin/dpkg
-        - usr/bin/rpm2cpio
-
-      dynamic-libraries:
-        - lib/**/*.so*
-        - usr/lib/**/*.so*
-
-      copyright:
-        - usr/share/doc/**/copyright
-
     prime:
-      - $executables
-      - $dynamic-libraries
-      - $copyright
+      - usr/bin/cpio
+      - usr/bin/bc
+      - usr/bin/curl
+      - usr/bin/dpkg
+      - usr/bin/dpkg-deb
+      - usr/bin/rpm2cpio
+      - lib/**/*.so*
+      - usr/lib/**/*.so*
+      - usr/share/doc/**/copyright
 
   # This part installs the `desktop-launch` script which initialises desktop
   # features such as fonts, themes and the XDG environment. It also installs
@@ -203,82 +191,55 @@ parts:
       - FLAVOR=gtk2
     build-packages:
       - libgtk2.0-dev
+    override-build: |
+      craftctl default
+
+      sed \
+        --in-place \
+        's|libgtk2.0-0/gtk-query-immodules-2.0|libgtk2.0-0t64/gtk-query-immodules-2.0|' \
+        "${CRAFT_PART_INSTALL}/bin/desktop-launch"
     stage-packages:
       - adwaita-icon-theme
       - dmz-cursor-theme
       - fcitx5-frontend-gtk2
       - fcitx-frontend-gtk2
-      - gnome-themes-standard
+      - gnome-themes-extra
       - ibus-gtk
-      - libappindicator1
       - libgdk-pixbuf2.0-0
       - libglib2.0-bin
-      - libgtk2.0-0
+      - libatk-adaptor
+      - libgail-common
+      - libgtk2.0-0t64
       - libgtk2.0-bin
       - libibus-1.0-5
       - libxkbcommon0  # XKB_CONFIG_ROOT
       - light-themes
       - locales-all
       - shared-mime-info
-      - ttf-ubuntu-font-family
+      - fonts-ubuntu
       - unity-gtk2-module
 
-    filesets:
-      copyright:
-        - usr/share/doc/**/copyright
-
-      executables:
-        - bin/desktop-launch
-        - flavor-select
-        - usr/bin/gtk-update-icon-cache
-        - usr/bin/update-mime-database
-        - usr/sbin/update-icon-caches
-
-      fontconfig-configs:
-        - etc/fonts
-
-      libraries:
-        - lib/**/*.so*
-        - usr/lib/**/*.so*
-        - -usr/lib/*/libgphoto2
-
-      library-executables:
-        - usr/lib/*/glib-2.0/glib-compile-schemas
-        - usr/lib/*/glib-2.0/gio-querymodules
-        - usr/lib/*/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
-        - usr/lib/*/libgtk2.0-0/gtk-query-immodules-2.0
-
-      mime-resources:
-        - usr/share/mime
-
-      x11-resources:
-        - usr/share/X11
-
-      exclude-fonts:
-        - -usr/share/fonts
-
-      exclude-icon-themes:
-        - -usr/share/icons
-
-      exclude-locale:
-        - -usr/lib/locale
-
-      exclude-ui-themes:
-        - -usr/share/themes
-
     prime:
-      - $copyright
-      - $fontconfig-configs
-      - $executables
-      - $libraries
-      - $library-executables
-      - $mime-resources
-      - $x11-resources
-
-      - $exclude-fonts
-      - $exclude-icon-themes
-      - $exclude-locale
-      - $exclude-ui-themes
+      - usr/share/doc/**/copyright
+      - etc/fonts
+      - bin/desktop-launch
+      - flavor-select
+      - usr/bin/gtk-update-icon-cache
+      - usr/bin/update-mime-database
+      - usr/sbin/update-icon-caches
+      - lib/**/*.so*
+      - usr/lib/**/*.so*
+      - -usr/lib/*/libgphoto2
+      - usr/lib/*/glib-2.0/glib-compile-schemas
+      - usr/lib/*/glib-2.0/gio-querymodules
+      - usr/lib/*/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
+      - usr/lib/*/libgtk2.0-0t64/gtk-query-immodules-2.0
+      - usr/share/mime
+      - usr/share/X11
+      - -usr/share/fonts
+      - -usr/share/icons
+      - -usr/lib/locale
+      - -usr/share/themes
 
   # Stage snap for fixing the Glibc locales
   # https://forum.snapcraft.io/t/the-locales-launch-stage-snap/10296
@@ -313,34 +274,20 @@ parts:
   # https://forum.snapcraft.io/t/integrate-custom-dialogs-in-your-snap/10825
   zenity-integration:
     plugin: nil
-    stage-snaps:
-      - zenity-integration
     stage-packages:
-      - libgtk-3-0
-      - libnotify4
-      - libwebkit2gtk-4.0-37
-
-    filesets:
-      copyright:
-        - usr/share/doc/**/copyright
-      executables:
-        - bin/zenity
-      locales:
-        - share/locale/**/zenity.mo
-      libraries:
-        - lib/**/*.so*
-        - usr/lib/**/*.so*
-        - -usr/lib/*/dri
-        - -usr/lib/*/libLLVM-*.so*
-      resources:
-        - share/zenity/**
+      - xkb-data
+      - zenity
 
     prime:
-      - $copyright
-      - $executables
-      - $libraries
-      - $locales
-      - $resources
+      - usr/share/doc/**/copyright
+      - usr/bin/zenity
+      - lib/**/*.so*
+      - usr/lib/**/*.so*
+      - -usr/lib/*/dri
+      - -usr/lib/*/libLLVM-*.so*
+      - usr/share/X11/xkb/**
+      - usr/share/locale/**/zenity.mo
+      - usr/share/zenity/**
 
   # ltrace for runtime-patching debugging
   # NOTE: For some reason it only be usable when the snap is install with --dev-mode
@@ -374,29 +321,23 @@ parts:
     override-build: |
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-resource-search-paths-in-make-policy-file-script.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/fix-resource-search-paths-in-make-policy-file-script.patch"
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-header-generation-in-make-policy-file-script.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/fix-header-generation-in-make-policy-file-script.patch"
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-footer-generation-in-make-policy-file-script.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/fix-footer-generation-in-make-policy-file-script.patch"
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-stanza-generation-in-make-policy-file-script.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/fix-stanza-generation-in-make-policy-file-script.patch"
 
-      snapcraftctl build
-
-    filesets:
-      application-data:
-        - usr/share/iscan-data/**
-        - usr/lib/iscan-data/**
-      copyright:
-        - usr/share/doc/**/copyright
+      craftctl default
 
     prime:
-      - $application-data
-      - $copyright
+      - usr/share/iscan-data/**
+      - usr/lib/iscan-data/**
+      - usr/share/doc/**/copyright
 
   main:
     after:
@@ -407,9 +348,10 @@ parts:
     override-pull: |
       set -o nounset
 
-      snapcraftctl pull
+      craftctl default
 
-      bash -x "${SNAPCRAFT_STAGE}"/scriptlets/main-adopt-info
+      bash -x \
+        "${CRAFT_PROJECT_DIR}"/snap/local/scriptlets/main-adopt-info
 
     plugin: autotools
     autotools-configure-parameters:
@@ -446,9 +388,10 @@ parts:
       - libpangoft2-1.0-0
       - libpixman-1-0
       - libpng16-16
-      - libsane
+      - libsane1
+      - libsensors5
       - libthai0
-      - libtiff5
+      - libtiff6
       - libxcb-render0
       - libxcb-shm0
       - libxcomposite1
@@ -466,108 +409,91 @@ parts:
 
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/libpng15.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/libpng15.patch"
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/jpegstream.cc.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/jpegstream.cc.patch"
       #patch \
         #--strip=0 \
-        #<"${SNAPCRAFT_STAGE}/buildtime-patching/hain01commits2dip-obj.patch"
+        #<"${CRAFT_STAGE}/buildtime-patching/hain01commits2dip-obj.patch"
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/iscan-2.30.4.2-c99.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/iscan-2.30.4.2-c99.patch"
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/iscan-2.30.3_fix-sscanf-modifier-in-cfg-obj.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/iscan-2.30.3_fix-sscanf-modifier-in-cfg-obj.patch"
       patch \
         --strip=0 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-local-state-dir.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-local-state-dir.patch"
       patch \
         --strip=1 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-package-library-dir.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-package-library-dir.patch"
       patch \
         --strip=1 \
-        <"${SNAPCRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-device-dir.patch"
+        <"${CRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-device-dir.patch"
 
       # add fix for CXX ABI different than 1002
       ln -s libesmod-x86_64.c2.so non-free/libesmod-x86_64.so
 
-      snapcraftctl build
+      craftctl default
       install \
         --mode 0644 \
         --verbose \
         backend/epkowa.conf \
-        "${SNAPCRAFT_PART_INSTALL}/etc/sane.d/"
-      echo epkowa > "${SNAPCRAFT_PART_INSTALL}/etc/sane.d/dll.d/epkowa.conf"
+        "${CRAFT_PART_INSTALL}/etc/sane.d/"
+      echo epkowa > "${CRAFT_PART_INSTALL}/etc/sane.d/dll.d/epkowa.conf"
 
       install \
         --directory \
         --mode 0755 \
         --verbose \
-        "${SNAPCRAFT_PART_INSTALL}/usr/share/applications/"
+        "${CRAFT_PART_INSTALL}/usr/share/applications/"
       install \
         --mode 0644 \
         --verbose \
         iscan.desktop \
-        "${SNAPCRAFT_PART_INSTALL}/usr/share/applications/"
+        "${CRAFT_PART_INSTALL}/usr/share/applications/"
 
       # Install EPSON's non-free enduser license
       install \
         --directory \
         --mode 0755 \
         --verbose \
-        "${SNAPCRAFT_PART_INSTALL}/usr/share/doc/iscan/"
+        "${CRAFT_PART_INSTALL}/usr/share/doc/iscan/"
       install \
         --mode 0644 \
         --verbose \
         non-free/COPYING.EPSON.*.txt \
-        "${SNAPCRAFT_PART_INSTALL}/usr/share/doc/iscan/"
+        "${CRAFT_PART_INSTALL}/usr/share/doc/iscan/"
 
       strip \
-        "${SNAPCRAFT_PART_INSTALL}/usr/bin/iscan" \
-        "${SNAPCRAFT_PART_INSTALL}/usr/lib/sane/libsane-epkowa.so."*.*.*
-
-    filesets:
-      application-executables:
-        - usr/bin/iscan
-        - usr/sbin/iscan-registry
-      application-desktop-entries:
-        - usr/share/applications/iscan.desktop
-      application-documentation:
-        - usr/share/doc/iscan
-      application-libraries:
-        - usr/lib/libesmod.so*
-      application-locales:
-        - usr/share/locale/**/iscan.mo
-      dynamic-libraries:
-        - lib/**/*.so*
-        - usr/lib/**/*.so*
-        - -usr/lib/*/perl
-        - -usr/lib/*/sane
-        - -usr/lib/*/libmysqlclient.so.21.2.30
-      copyright:
-        - usr/share/doc/**/copyright
-      sane-configs:
-        - etc/sane.d/**
+        "${CRAFT_PART_INSTALL}/usr/bin/iscan" \
+        "${CRAFT_PART_INSTALL}/usr/lib/sane/libsane-epkowa.so."*.*.*
 
     prime:
-      - $application-executables
-      - $application-desktop-entries
-      - $application-documentation
-      - $application-libraries
-      - $application-locales
-      - $dynamic-libraries
-      - $copyright
-      - $sane-configs
+      - usr/bin/iscan
+      - usr/sbin/iscan-registry
+      - usr/share/applications/iscan.desktop
+      - usr/share/doc/iscan
+      - usr/lib/libesmod.so*
+      - usr/share/locale/**/iscan.mo
+      - lib/**/*.so*
+      - usr/lib/**/*.so*
+      - -usr/lib/*/perl
+      - -usr/lib/*/sane
+      - -usr/lib/*/libmysqlclient.so.21.2.30
+      - usr/lib/udev/rules.d/60-libsane1.rules
+      - usr/share/doc/**/copyright
+      - etc/sane.d/**
     override-prime: |
       set \
         -o nounset
 
-      snapcraftctl prime
+      craftctl default
 
       # Drop unused sane daemon drop-in configuration files to cut down
       # application launch time
-      for sane_daemon_dropin_config in "${SNAPCRAFT_PRIME}/etc/sane.d/"*.conf; do
+      for sane_daemon_dropin_config in "${CRAFT_PRIME}/etc/sane.d/"*.conf; do
         config_filename="${sane_daemon_dropin_config##*/}"
         config_name="${config_filename%.*}"
         if test "${config_name}" == epkowa; then
@@ -578,7 +504,7 @@ parts:
           "${sane_daemon_dropin_config}"
       done
 
-      "${SNAPCRAFT_STAGE}/buildtime-patching/patch-desktop-entries.bash"
+      "${CRAFT_STAGE}/buildtime-patching/patch-desktop-entries.bash"
 
 # Apps that are exposed by the snap package
 # If the _app_name_ is identical with the iscan it can be directly run
@@ -603,10 +529,11 @@ apps:
     environment:
       GTK_PATH: $SNAP/lib/gtk-2.0
       GTK_DATA_PREFIX: $SNAP
+      GSK_RENDERER: cairo
       XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
 
       SANE_CONFIG_DIR: $SNAP/etc/sane.d
-      LD_LIBRARY_PATH: $SNAP/usr/lib/sane:$SNAP/usr/lib
+      LD_LIBRARY_PATH: $SNAP/usr/lib/sane:$SNAP/usr/lib:$SNAP/usr/lib/x86_64-linux-gnu
 
   make-policy-file:
     command: usr/lib/iscan-data/make-policy-file
@@ -626,6 +553,7 @@ apps:
     environment:
       GTK_PATH: $SNAP/lib/gtk-2.0
       GTK_DATA_PREFIX: $SNAP
+      GSK_RENDERER: cairo
       XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
 
 # Refer the following documentation for asserting interface plugs and slots in a security confined snap:
