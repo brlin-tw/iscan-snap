@@ -14,7 +14,7 @@
 # For support refer to the snapcraft section in the Snapcraft Forum:
 # https://forum.snapcraft.io/c/snapcraft
 #
-# Copyright 2018-2022 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+# Copyright 2026 林博仁(Buo-ren Lin) <buo.ren.lin@gmail.com>
 # SPDX-License-Identifier: MIT
 
 # All following comments, including this one, are designed to be stripped
@@ -310,7 +310,12 @@ parts:
   data:
     after:
       - buildtime-patching
-    source: http://support.epson.net/linux/src/scanner/iscan/iscan-data_1.39.2-1.tar.gz
+    # DISABLED: EPSON blocked the download of the source tarball, so we
+    # have to use a third-party archive instead.
+    #source: http://support.epson.net/linux/src/scanner/iscan/iscan-data_1.39.2-1.tar.gz
+    source: https://github.com/brlin-tw/iscan-data.git
+    source-branch: upstream
+    source-depth: 1
     plugin: autotools
     build-packages:
       - xsltproc
@@ -344,7 +349,12 @@ parts:
       - buildtime-patching
       - scriptlets
 
-    source: http://support.epson.net/linux/src/scanner/iscan/iscan_2.30.4-2.tar.gz
+    # DISABLED: EPSON blocked the download of the source tarball, so we
+    # have to use a third-party archive instead.
+    #source: http://support.epson.net/linux/src/scanner/iscan/iscan_2.30.4-2.tar.gz
+    source: https://github.com/brlin-tw/iscan.git
+    source-branch: upstream
+    source-depth: 1
     override-pull: |
       set -o nounset
 
@@ -353,6 +363,7 @@ parts:
       bash -x \
         "${CRAFT_PROJECT_DIR}"/snap/local/scriptlets/main-adopt-info
 
+      "${CRAFT_PROJECT_DIR}/snap/local/scriptlets/acquire-non-free-components.sh"
     plugin: autotools
     autotools-configure-parameters:
       - --enable-dependency-reduction
