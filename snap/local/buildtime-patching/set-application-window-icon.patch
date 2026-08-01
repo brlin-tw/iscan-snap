@@ -1,0 +1,30 @@
+This patch sets the application window icon explicitly because desktop-entry
+icon metadata is not automatically applied to GTK windows.
+
+Copyright 2026 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
+SPDX-License-Identifier: MIT
+
+--- frontend/pisa_main.cc
++++ frontend/pisa_main.cc
+@@ -99,6 +99,21 @@
+ #endif	// HAVE_ANY_GIMP
+     }
+ 
++  const char * snap = getenv ( "SNAP" );
++  if ( snap )
++    {
++      gchar * icon_path = g_build_filename ( snap, "meta", "gui",
++                                             "icon.svg", NULL );
++      GError * error = NULL;
++      if ( !gtk_window_set_default_icon_from_file ( icon_path, &error ) )
++        {
++          g_warning ( "Failed to set the default window icon from %s: %s",
++                      icon_path, error->message );
++          g_error_free ( error );
++        }
++      g_free ( icon_path );
++    }
++
+   g_view_manager->create_window ( ID_WINDOW_MAIN  );
+   g_view_manager->main ( );
+ }

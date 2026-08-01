@@ -207,6 +207,7 @@ parts:
       - ibus-gtk
       - libgdk-pixbuf2.0-0
       - libglib2.0-bin
+      - librsvg2-common
       - libatk-adaptor
       - libgail-common
       - libgtk2.0-0t64
@@ -442,6 +443,9 @@ parts:
       patch \
         --strip=1 \
         <"${CRAFT_STAGE}/buildtime-patching/fix-application-hardcoding-device-dir.patch"
+      patch \
+        --strip=0 \
+        <"${CRAFT_STAGE}/buildtime-patching/set-application-window-icon.patch"
 
       # add fix for CXX ABI different than 1002
       ln -s libesmod-x86_64.c2.so non-free/libesmod-x86_64.so
