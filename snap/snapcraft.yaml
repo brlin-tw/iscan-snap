@@ -547,6 +547,9 @@ apps:
       GSK_RENDERER: cairo
       XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
 
+      # Support IME over portal
+      IBUS_USE_PORTAL: 1
+
       SANE_CONFIG_DIR: $SNAP/etc/sane.d
       LD_LIBRARY_PATH: $SNAP/usr/lib/sane:$SNAP/usr/lib:$SNAP/usr/lib/x86_64-linux-gnu
 
