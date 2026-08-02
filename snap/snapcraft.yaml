@@ -375,6 +375,11 @@ parts:
       - --prefix=/usr
       - LDFLAGS=-lpng
     build-packages:
+      # Dependency of acquire-non-free-components.sh
+      - curl
+      - gzip
+      - tar
+
       - gettext
       - libgimp2.0-dev
       - libgtk2.0-dev
